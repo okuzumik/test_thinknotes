@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ThinkNotes</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -489,51 +488,9 @@ body {
   font-family:'Hiragino Kaku Gothic ProN',sans-serif; color:var(--text);
 }
 .mobile-search-in::placeholder { color:var(--text3); }
-
-/* ═══ LOGIN OVERLAY ═══ */
-.login-overlay {
-  position:fixed; inset:0; z-index:9999;
-  background:var(--bg);
-  display:flex; align-items:center; justify-content:center;
-}
-.login-box {
-  background:var(--bg2); border:0.5px solid var(--border2);
-  border-radius:var(--r); padding:2.5rem 2rem;
-  width:360px; max-width:92vw;
-  box-shadow:0 8px 32px rgba(0,0,0,.10);
-  display:flex; flex-direction:column; gap:16px;
-}
-.login-title { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:20px; font-weight:700; color:var(--accent); }
-.login-sub { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:12px; color:var(--text3); line-height:1.7; margin-top:-6px; }
-.login-input { width:100%; padding:10px 12px; border:0.5px solid var(--border2); border-radius:var(--rsm); font-size:15px; font-family:inherit; color:var(--text); background:var(--bg3); outline:none; }
-.login-input:focus { border-color:var(--accent-m); background:var(--bg2); }
-.login-btn { width:100%; padding:11px; background:var(--accent); color:#fff; border:none; border-radius:var(--rsm); font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
-.login-btn:hover { background:var(--accent-d); }
-.login-btn:disabled { opacity:.5; cursor:default; }
-.login-msg { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:12px; line-height:1.7; text-align:center; min-height:1em; }
-.login-msg.ok { color:var(--teal); }
-.login-msg.err { color:var(--red); }
-.user-badge { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:11px; color:var(--text3); display:flex; align-items:center; gap:6px; }
-.logout-btn { padding:2px 8px; background:none; border:0.5px solid var(--border2); border-radius:20px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:10px; color:var(--text3); cursor:pointer; }
-.logout-btn:hover { border-color:var(--red); color:var(--red); }
-.sync-dot { width:6px; height:6px; border-radius:50%; background:var(--border2); flex-shrink:0; transition:background .3s; }
-.sync-dot.syncing { background:var(--accent-m); }
-.sync-dot.saved { background:var(--teal); }
 </style>
 </head>
 <body>
-
-<!-- ログインオーバーレイ -->
-<div class="login-overlay" id="loginOverlay">
-  <div class="login-box">
-    <div class="login-title">ThinkNotes</div>
-    <div class="login-sub">メールアドレスを入力してください。<br>ログイン用のリンクをお送りします。</div>
-    <input class="login-input" type="email" id="loginEmail" placeholder="メールアドレス"
-      onkeydown="if(event.key==='Enter')sendMagicLink()">
-    <button class="login-btn" id="loginBtn" onclick="sendMagicLink()">ログインリンクを送る</button>
-    <div class="login-msg" id="loginMsg"></div>
-  </div>
-</div>
 
 <!-- ── Topbar ── -->
 <div class="topbar">
@@ -552,11 +509,6 @@ body {
     </button>
   </div>
   <div class="topbar-right">
-    <div class="sync-dot" id="syncDot" title="保存状態"></div>
-    <div class="user-badge" id="userBadge" style="display:none">
-      <span id="userEmail" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-      <button class="logout-btn" onclick="signOut()">ログアウト</button>
-    </div>
     <div class="search-wrap" id="searchWrap">
       <span class="search-icon">🔍</span>
       <input class="search-in" id="searchIn" placeholder="検索…" oninput="onSearch(this.value)">
@@ -720,115 +672,6 @@ body {
 </div>
 
 <script>
-// ─── Supabase ─────────────────────────────────────────────
-const SUPA_URL='https://ojdvyoubvhmtslvxfsxl.supabase.co';
-const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qZHZ5b3VidmhtdHNsdnhmc3hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NDg1ODEsImV4cCI6MjA5MTMyNDU4MX0.ah01RDXey3g0KB_xsj3hkBlyaNHt9YIyCjSluHCzlRI';
-const sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
-let currentUser=null;
-
-async function initAuth(){
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){
-    currentUser=session.user;
-    showApp();
-    await loadFromSupabase();
-  } else {
-    showLogin();
-  }
-  sb.auth.onAuthStateChange(async(event,session)=>{
-    if(session&&!currentUser){
-      currentUser=session.user;
-      showApp();
-      await loadFromSupabase();
-    } else if(!session){
-      currentUser=null;showLogin();
-    }
-  });
-}
-function showLogin(){
-  document.getElementById('loginOverlay').style.display='flex';
-  document.getElementById('userBadge').style.display='none';
-}
-function showApp(){
-  document.getElementById('loginOverlay').style.display='none';
-  const ub=document.getElementById('userBadge');
-  ub.style.display='flex';
-  document.getElementById('userEmail').textContent=currentUser.email||'';
-}
-async function sendMagicLink(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const msg=document.getElementById('loginMsg');
-  const btn=document.getElementById('loginBtn');
-  if(!email){msg.textContent='メールアドレスを入力してください';msg.className='login-msg err';return;}
-  btn.disabled=true;btn.textContent='送信中…';
-  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.href}});
-  btn.disabled=false;btn.textContent='ログインリンクを送る';
-  if(error){msg.textContent='エラー: '+error.message;msg.className='login-msg err';}
-  else{msg.textContent=`✓ ${email} にログインリンクを送りました。メールを確認してください。`;msg.className='login-msg ok';}
-}
-async function signOut(){
-  await sb.auth.signOut();
-  currentUser=null;showLogin();
-}
-
-async function loadFromSupabase(){
-  if(!currentUser)return;
-  setSyncDot('syncing');
-  const {data,error}=await sb.from('thinkdata')
-    .select('data_key,data_value').eq('user_id',currentUser.id);
-  if(error){console.error('load error',error);loadLocal();setSyncDot('');return;}
-  const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
-  posts=map.posts||JSON.parse(localStorage.getItem(KP)||'[]');
-  notes=map.notes||JSON.parse(localStorage.getItem(KN)||'[]');
-  outlines=map.outlines||JSON.parse(localStorage.getItem(KO)||'[]');
-  // migrate
-  notes.forEach(n=>{
-    if(!n.items)n.items=[];if(!n.stickies)n.stickies=[];
-    if(!n.paragraphs)n.paragraphs=n.body?n.body.split('\n').filter(l=>l.trim()):[];
-  });
-  if(!posts.length)posts=DEMO_POSTS;
-  if(!notes.length)notes=DEMO_NOTES;
-  // cache locally
-  localStorage.setItem(KP,JSON.stringify(posts));
-  localStorage.setItem(KN,JSON.stringify(notes));
-  localStorage.setItem(KO,JSON.stringify(outlines));
-  setSyncDot('saved');
-  renderSidebar();renderFeed();
-}
-
-async function saveToSupabase(){
-  if(!currentUser)return;
-  setSyncDot('syncing');
-  const uid=currentUser.id;
-  const ts=new Date().toISOString();
-  const {error}=await Promise.all([
-    sb.from('thinkdata').upsert({user_id:uid,data_key:'posts',data_value:posts,updated_at:ts},{onConflict:'user_id,data_key'}),
-    sb.from('thinkdata').upsert({user_id:uid,data_key:'notes',data_value:notes,updated_at:ts},{onConflict:'user_id,data_key'}),
-    sb.from('thinkdata').upsert({user_id:uid,data_key:'outlines',data_value:outlines,updated_at:ts},{onConflict:'user_id,data_key'}),
-  ]).then(results=>{return results.find(r=>r.error)||{};});
-  setSyncDot(error?'':'saved');
-  if(error)console.error('save error',error);
-}
-
-function setSyncDot(state){
-  const dot=document.getElementById('syncDot');
-  if(!dot)return;
-  dot.className='sync-dot'+(state?' '+state:'');
-  dot.title=state==='syncing'?'同期中…':state==='saved'?'保存済み':'';
-  if(state==='saved')setTimeout(()=>{if(dot.classList.contains('saved'))dot.className='sync-dot';},2000);
-}
-
-function loadLocal(){
-  try{posts=JSON.parse(localStorage.getItem(KP)||'[]');}catch(e){posts=[];}
-  try{notes=JSON.parse(localStorage.getItem(KN)||'[]');}catch(e){notes=[];}
-  try{outlines=JSON.parse(localStorage.getItem(KO)||'[]');}catch(e){outlines=[];}
-  notes.forEach(n=>{
-    if(!n.items)n.items=[];if(!n.stickies)n.stickies=[];
-    if(!n.paragraphs)n.paragraphs=n.body?n.body.split('\n').filter(l=>l.trim()):[];
-  });
-  if(!posts.length)posts=DEMO_POSTS;
-  if(!notes.length)notes=DEMO_NOTES;
-}
 // ─── State ────────────────────────────────────────────────
 const KP='tn_posts_v20', KN='tn_notes_v20', KO='tn_outlines_v20';
 let posts=[], notes=[], outlines=[];
@@ -848,16 +691,28 @@ let _pickerStickyId=null;
 // post edit
 let editingPostId=null, editingTagPostId=null, replyingToId=null;
 
-// ─── Persist (local fallback) ─────────────────────────────
-function load(){loadLocal();}
+// ─── Persist ─────────────────────────────────────────────
+function load(){
+  try{posts=JSON.parse(localStorage.getItem(KP)||'[]');}catch(e){posts=[];}
+  try{notes=JSON.parse(localStorage.getItem(KN)||'[]');}catch(e){notes=[];}
+  try{outlines=JSON.parse(localStorage.getItem(KO)||'[]');}catch(e){outlines=[];}
+  notes.forEach(n=>{
+    if(!n.items)n.items=(n.postIds||[]).map(id=>typeof id==='string'?{id,level:0}:id);
+    if(!n.stickies)n.stickies=[];
+    if(!n.paragraphs)n.paragraphs=n.body?n.body.split('\n').filter(l=>l.trim()):[];
+    delete n.postIds;
+  });
+  // repliesフィールドの移行
+  posts.forEach(p=>{if(!p.replies)p.replies=[];});
+  if(!notes.length)notes=DEMO_NOTES;
+}
 function save(){
-  // ローカルに即時保存
-  localStorage.setItem(KP,JSON.stringify(posts));
-  localStorage.setItem(KN,JSON.stringify(notes));
-  localStorage.setItem(KO,JSON.stringify(outlines));
-  // Supabaseにデバウンス保存
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(saveToSupabase,1500);
+  saveTimer=setTimeout(()=>{
+    localStorage.setItem(KP,JSON.stringify(posts));
+    localStorage.setItem(KN,JSON.stringify(notes));
+    localStorage.setItem(KO,JSON.stringify(outlines));
+  },400);
 }
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -1641,7 +1496,9 @@ const DEMO_NOTES=[
 ];
 
 // ─── Init ────────────────────────────────────────────────
-initAuth();
+load();
+renderSidebar();
+renderFeed();
 </script>
 </body>
 </html>

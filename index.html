@@ -392,6 +392,18 @@ body {
 .reply-del { background:none; border:none; cursor:pointer; font-size:10px; color:var(--text3); padding:2px 4px; border-radius:3px; opacity:0; }
 .reply-post:hover .reply-del { opacity:1; }
 .reply-del:hover { color:var(--red); }
+.reply-edit-btn { background:none; border:none; cursor:pointer; font-size:10px; color:var(--text3); padding:2px 4px; border-radius:3px; opacity:0; }
+.reply-post:hover .reply-edit-btn { opacity:1; }
+.reply-edit-btn:hover { color:var(--accent); }
+.reply-edit-wrap { margin-top:5px; }
+.reply-edit-ta { width:100%; padding:7px 9px; background:var(--bg2); border:0.5px solid var(--border2); border-radius:var(--rsm); font-family:inherit; font-size:13.5px; color:var(--text); line-height:1.75; resize:none; outline:none; min-height:60px; }
+.reply-edit-ta:focus { border-color:var(--accent-m); }
+.reply-edit-actions { display:flex; gap:6px; margin-top:5px; }
+/* アウトラインパネル 連ツイ展開 */
+.all-post-replies { padding:5px 0 2px; border-top:0.5px dashed var(--border); margin-top:5px; }
+.all-post-reply-item { font-size:12px; color:var(--text2); line-height:1.65; padding:3px 0; border-bottom:0.5px solid var(--border); white-space:pre-wrap; word-break:break-word; }
+.all-post-reply-item:last-child { border-bottom:none; }
+.thread-toggle { background:none; border:none; cursor:pointer; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:10px; color:var(--accent-d); padding:0; }
 /* 返信入力欄 */
 .reply-compose { margin-top:4px; padding-left:27px; }
 .reply-ta {
@@ -488,9 +500,11 @@ body {
   font-family:'Hiragino Kaku Gothic ProN',sans-serif; color:var(--text);
 }
 .mobile-search-in::placeholder { color:var(--text3); }
+
 </style>
 </head>
 <body>
+
 
 <!-- ── Topbar ── -->
 <div class="topbar">
@@ -509,6 +523,7 @@ body {
     </button>
   </div>
   <div class="topbar-right">
+    <button onclick="exportBackup()" style="padding:3px 10px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text3);cursor:pointer;" title="データをバックアップ">💾 バックアップ</button>
     <div class="search-wrap" id="searchWrap">
       <span class="search-icon">🔍</span>
       <input class="search-in" id="searchIn" placeholder="検索…" oninput="onSearch(this.value)">
@@ -672,6 +687,55 @@ body {
 </div>
 
 <script>
+// ─── Persist ─────────────────────────────────────────────
+
+function load(){loadLocal();}
+function save(){
+  localStorage.setItem(KP,JSON.stringify(posts));
+  localStorage.setItem(KN,JSON.stringify(notes));
+  localStorage.setItem(KO,JSON.stringify(outlines));
+}
+
+// ─── バックアップ ─────────────────────────────────────────
+function exportBackup(){
+  const data={version:20,exportedAt:new Date().toISOString(),posts,notes,outlines};
+  const date=new Date().toISOString().slice(0,10);
+  dl(new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}),
+    `thinknotes-backup-${date}.json`);
+}
+function importBackup(){
+  const input=document.createElement('input');
+  input.type='file';input.accept='.json';
+  input.onchange=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    try{
+      const data=JSON.parse(await file.text());
+      if(!data.posts||!data.notes){alert('有効なバックアップファイルではありません');return;}
+      if(!confirm(`復元しますか？\n投稿：${data.posts.length}件　ノート：${data.notes.length}件\n※現在のデータは上書きされます`))return;
+      posts=data.posts||[];notes=data.notes||[];outlines=data.outlines||[];
+      notes.forEach(n=>{
+        if(!n.items)n.items=[];if(!n.stickies)n.stickies=[];
+        if(!n.paragraphs)n.paragraphs=n.body?n.body.split('\n').filter(l=>l.trim()):[];
+      });
+      posts.forEach(p=>{if(!p.replies)p.replies=[];});
+      save();renderSidebar();renderFeed();
+      alert('✓ 復元が完了しました');
+    }catch(err){alert('読み込みエラー: '+err.message);}
+  };
+  input.click();
+}
+
+function loadLocal(){
+  try{posts=JSON.parse(localStorage.getItem(KP)||'[]');}catch(e){posts=[];}
+  try{notes=JSON.parse(localStorage.getItem(KN)||'[]');}catch(e){notes=[];}
+  try{outlines=JSON.parse(localStorage.getItem(KO)||'[]');}catch(e){outlines=[];}
+  notes.forEach(n=>{
+    if(!n.items)n.items=[];if(!n.stickies)n.stickies=[];
+    if(!n.paragraphs)n.paragraphs=n.body?n.body.split('\n').filter(l=>l.trim()):[];
+  });
+  if(!posts.length)posts=DEMO_POSTS;
+  if(!notes.length)notes=DEMO_NOTES;
+}
 // ─── State ────────────────────────────────────────────────
 const KP='tn_posts_v20', KN='tn_notes_v20', KO='tn_outlines_v20';
 let posts=[], notes=[], outlines=[];
@@ -690,29 +754,19 @@ let _syncScrolling=false;
 let _pickerStickyId=null;
 // post edit
 let editingPostId=null, editingTagPostId=null, replyingToId=null;
+let editingReplyKey=null; // 'pid:ri' format
+const expandedOutlineCards=new Set(); // pids with replies shown
 
-// ─── Persist ─────────────────────────────────────────────
-function load(){
-  try{posts=JSON.parse(localStorage.getItem(KP)||'[]');}catch(e){posts=[];}
-  try{notes=JSON.parse(localStorage.getItem(KN)||'[]');}catch(e){notes=[];}
-  try{outlines=JSON.parse(localStorage.getItem(KO)||'[]');}catch(e){outlines=[];}
-  notes.forEach(n=>{
-    if(!n.items)n.items=(n.postIds||[]).map(id=>typeof id==='string'?{id,level:0}:id);
-    if(!n.stickies)n.stickies=[];
-    if(!n.paragraphs)n.paragraphs=n.body?n.body.split('\n').filter(l=>l.trim()):[];
-    delete n.postIds;
-  });
-  // repliesフィールドの移行
-  posts.forEach(p=>{if(!p.replies)p.replies=[];});
-  if(!notes.length)notes=DEMO_NOTES;
-}
+// ─── Persist (local fallback) ─────────────────────────────
+function load(){loadLocal();}
 function save(){
+  // ローカルに即時保存
+  localStorage.setItem(KP,JSON.stringify(posts));
+  localStorage.setItem(KN,JSON.stringify(notes));
+  localStorage.setItem(KO,JSON.stringify(outlines));
+  // Supabaseにデバウンス保存
   clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-    localStorage.setItem(KP,JSON.stringify(posts));
-    localStorage.setItem(KN,JSON.stringify(notes));
-    localStorage.setItem(KO,JSON.stringify(outlines));
-  },400);
+  saveTimer=setTimeout(saveToSupabase,1500);
 }
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -739,7 +793,6 @@ function switchPhase(n){
     document.getElementById('phase'+i).classList.toggle('active',i===n);
   });
   document.getElementById('tagSidebar').style.display=n===1?'':'none';
-  document.getElementById('searchWrap').style.display=n===1?'':'none';
   if(n===1)renderFeed();
   if(n===2){renderOutlineTagFilters();renderAllPostsPanel();renderOutlineFeed();renderSavedOutlinesBar();}
   if(n===3){renderNotesList();}
@@ -770,7 +823,7 @@ function filteredPosts(){
   if(searchQuery){const q=searchQuery.toLowerCase();r=r.filter(p=>p.content.toLowerCase().includes(q));}
   if(currentFilter==='starred')r=r.filter(p=>p.starred);
   if(currentTag)r=r.filter(p=>extractTags(p.content).includes(currentTag));
-  return r.sort((a,b)=>b.createdAt-a.createdAt);
+  return r.sort((a,b)=>(b.updatedAt||b.createdAt)-(a.updatedAt||a.createdAt));
 }
 function renderFeed(){
   const fp=filteredPosts();
@@ -798,14 +851,26 @@ function renderPost(p){
       <div class="thread-line-area">
         <div class="thread-line"></div>
         <div class="thread-replies">
-          ${replies.map((r,ri)=>`
-            <div class="reply-post" id="reply-${p.id}-${ri}">
-              <div class="reply-text">${esc(r.content)}</div>
+          ${replies.map((r,ri)=>{
+            const rkey=p.id+':'+ri;
+            const isEditingR=editingReplyKey===rkey;
+            return`<div class="reply-post" id="reply-${p.id}-${ri}">
+              ${isEditingR
+                ?`<div class="reply-edit-wrap">
+                    <textarea class="reply-edit-ta" id="reply-edit-ta-${rkey}">${esc(r.content)}</textarea>
+                    <div class="reply-edit-actions">
+                      <button class="post-edit-btn save" onclick="saveReplyEdit('${p.id}',${ri})">保存</button>
+                      <button class="post-edit-btn cancel" onclick="cancelReplyEdit()">キャンセル</button>
+                    </div>
+                  </div>`
+                :`<div class="reply-text">${esc(r.content)}</div>`}
               <div class="reply-meta">
                 <span class="reply-time">${fmtDt(r.createdAt)}</span>
+                <button class="reply-edit-btn" onclick="startReplyEdit('${p.id}',${ri})">✎</button>
                 <button class="reply-del" onclick="deleteReply('${p.id}',${ri})">✕</button>
               </div>
-            </div>`).join('')}
+            </div>`;
+          }).join('')}
         </div>
       </div>
     </div>`:'';
@@ -858,7 +923,7 @@ function renderPost(p){
 // Post CRUD
 function submitPost(){
   const ta=document.getElementById('composeTA');const text=ta.value.trim();if(!text)return;
-  posts.push({id:uid(),content:text,createdAt:Date.now(),starred:false,replies:[]});
+  posts.push({id:uid(),content:text,createdAt:Date.now(),updatedAt:Date.now(),starred:false,replies:[]});
   ta.value='';ta.style.height='';save();renderFeed();renderSidebar();
 }
 
@@ -875,12 +940,31 @@ function submitReply(pid){
   const p=posts.find(x=>x.id===pid);if(!p)return;
   if(!p.replies)p.replies=[];
   p.replies.push({id:uid(),content:text,createdAt:Date.now()});
+  p.updatedAt=Date.now();
   replyingToId=null;save();renderFeed();
 }
 function deleteReply(pid,idx){
   const p=posts.find(x=>x.id===pid);if(!p||!p.replies)return;
   p.replies.splice(idx,1);save();renderFeed();
 }
+function startReplyEdit(pid,ri){
+  editingReplyKey=pid+':'+ri;
+  editingPostId=null;replyingToId=null;
+  renderFeed();
+  setTimeout(()=>{
+    const ta=document.getElementById('reply-edit-ta-'+pid+':'+ri);
+    if(!ta)return;
+    ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';
+    ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);
+  },30);
+}
+function saveReplyEdit(pid,ri){
+  const ta=document.getElementById('reply-edit-ta-'+pid+':'+ri);if(!ta)return;
+  const p=posts.find(x=>x.id===pid);if(!p||!p.replies||!p.replies[ri])return;
+  p.replies[ri].content=ta.value;
+  editingReplyKey=null;save();renderFeed();
+}
+function cancelReplyEdit(){editingReplyKey=null;renderFeed();}
 function onReplyKey(e,pid){
   if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();submitReply(pid);}
   setTimeout(()=>{const t=e.target;t.style.height='auto';t.style.height=Math.min(160,t.scrollHeight)+'px';},0);
@@ -983,19 +1067,35 @@ function renderAllPostsPanel(){
   if(!pool.length){feed.innerHTML=`<div class="empty-state"><div class="empty-icon">✦</div>メモがありません</div>`;return;}
   feed.innerHTML=pool.map(p=>{
     const inOut=outIds.has(p.id);
-    const replyCount=(p.replies||[]).length;
+    const replies=p.replies||[];
+    const expanded=expandedOutlineCards.has(p.id);
+    const repliesHtml=expanded&&replies.length?`
+      <div class="all-post-replies">
+        ${replies.map(r=>`<div class="all-post-reply-item">${esc(r.content)}</div>`).join('')}
+      </div>`:'';
     return`<div class="all-post-card ${inOut?'in-outline':''}">
       <div class="all-post-text">${esc(cleanText(p.content))}</div>
-      ${replyCount?`<div style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;color:var(--text3);margin-top:4px;">↩ 連ツイ ${replyCount}件</div>`:''}
+      ${replies.length?`<div style="margin-top:4px;">
+        <button class="thread-toggle" onclick="toggleOutlineCard('${p.id}')">
+          ↩ 連ツイ ${replies.length}件 ${expanded?'▲':'▼'}
+        </button>
+      </div>`:''}
+      ${repliesHtml}
       <div class="all-post-foot">
         <span class="all-post-time">${fmtDt(p.createdAt)}</span>
         <button class="add-to-outline-btn ${inOut?'remove':'add'}"
           onclick="${inOut?`removeFromOutline('${p.id}')`:`addToOutline('${p.id}')`}">
-          ${inOut?'✕ 外す':replyCount?`＋ 追加（連ツイ込み）`:'＋ 追加'}
+          ${inOut?'✕ 外す':replies.length?'＋ 追加（連ツイ込み）':'＋ 追加'}
         </button>
       </div>
     </div>`;
   }).join('');
+}
+
+function toggleOutlineCard(pid){
+  if(expandedOutlineCards.has(pid))expandedOutlineCards.delete(pid);
+  else expandedOutlineCards.add(pid);
+  renderAllPostsPanel();
 }
 
 function addToOutline(pid){

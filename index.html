@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ThinkNotes</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -446,7 +446,8 @@ body {
 
 /* エディターペイン */
 .editor-pane { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; background:var(--bg3); }
-.editor-toolbar { display:flex; align-items:center; gap:6px; padding:8px 14px; border-bottom:0.5px solid var(--border); flex-shrink:0; background:var(--bg3); }
+.user-menu-item { display:block; width:100%; padding:8px 14px; text-align:left; background:none; border:none; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:12px; color:var(--text); cursor:pointer; white-space:nowrap; }
+.user-menu-item:hover { background:var(--bg3); } align-items:center; gap:6px; padding:8px 14px; border-bottom:0.5px solid var(--border); flex-shrink:0; background:var(--bg3); }
 .editor-title-in { flex:1; background:transparent; border:none; outline:none; font-size:15px; font-weight:700; font-family:inherit; color:var(--text); }
 .editor-title-in::placeholder { color:var(--text3); }
 .et-sep { width:0.5px; height:16px; background:var(--border); }
@@ -572,7 +573,22 @@ body {
 @media (max-width: 640px) {
   body { font-size:16px; }
 
-  /* ── モバイル：タイムライン専用レイアウト ── */
+  /* ノートMarkdownプレビュー */
+.note-preview-body h1,.note-preview-body h2,.note-preview-body h3 { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-weight:700; color:var(--text); margin:1.5em 0 .5em; line-height:1.35; }
+.note-preview-body h1 { font-size:1.5em; border-bottom:0.5px solid var(--border); padding-bottom:.4em; }
+.note-preview-body h2 { font-size:1.2em; }
+.note-preview-body h3 { font-size:1em; }
+.note-preview-body p { margin:.7em 0; }
+.note-preview-body ul,.note-preview-body ol { padding-left:1.5em; margin:.5em 0; }
+.note-preview-body li { margin:.2em 0; }
+.note-preview-body code { font-family:monospace; font-size:.9em; background:var(--bg3); border:0.5px solid var(--border2); border-radius:3px; padding:1px 5px; }
+.note-preview-body pre { background:var(--bg3); border:0.5px solid var(--border2); border-radius:var(--rsm); padding:1em; overflow-x:auto; margin:.8em 0; }
+.note-preview-body pre code { background:none; border:none; padding:0; }
+.note-preview-body blockquote { border-left:3px solid var(--border2); padding-left:1em; color:var(--text2); margin:.8em 0; }
+.note-preview-body strong { font-weight:700; }
+.note-preview-body em { font-style:italic; }
+.note-preview-body hr { border:none; border-top:0.5px solid var(--border); margin:1.5em 0; }
+.note-preview-body a { color:var(--accent); text-decoration:underline; }
   /* トップバー：アプリ名のみ、タブ全非表示 */
   .topbar { padding:0 .75rem; height:44px; }
   .app-name { font-size:15px; }
@@ -580,7 +596,7 @@ body {
   .topbar-right { display:none !important; }
 
   /* モバイル専用Bskyボタン（トップバー） */
-  #mobileBskyTopBtn { display:block !important; margin-left:auto; }
+  #mobileTopBtns { display:flex !important; }
 
   /* サイドバー・検索・モバイルツールバー全非表示 */
   .tag-sidebar { display:none !important; }
@@ -800,9 +816,11 @@ body {
 .user-badge { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:11px; color:var(--text3); display:flex; align-items:center; gap:6px; }
 .logout-btn { padding:2px 8px; background:none; border:0.5px solid var(--border2); border-radius:20px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:10px; color:var(--text3); cursor:pointer; }
 .logout-btn:hover { border-color:var(--red); color:var(--red); }
-.sync-dot { width:6px; height:6px; border-radius:50%; background:var(--border2); flex-shrink:0; transition:background .3s; }
-.sync-dot.syncing { background:var(--accent-m); }
+.sync-dot { width:8px; height:8px; border-radius:50%; background:var(--border2); flex-shrink:0; transition:background .3s; cursor:default; }
+.sync-dot.syncing { background:#f0a020; animation:syncpulse .8s infinite alternate; }
 .sync-dot.saved { background:var(--teal); }
+.sync-dot.error { background:var(--red); cursor:pointer; }
+@keyframes syncpulse { from{opacity:1;} to{opacity:.4;} }
 
 /* Bluesky設定モーダル */
 /* モバイル用 日ビューパネル（スライドイン） */
@@ -835,13 +853,13 @@ body {
 .card-grid-count { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:11px; color:var(--text3); }
 .card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:10px; padding:1rem 1.5rem 3rem; overflow-y:auto; align-content:start; flex:1; }
 .card-grid-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text3); font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:13px; text-align:center; line-height:1.8; }
-.card-cell { background:var(--bg2); border:0.5px solid var(--border); border-left:3px solid var(--border2); border-radius:var(--rsm); padding:11px; cursor:pointer; transition:border-color .12s; display:flex; flex-direction:column; gap:5px; height:190px; overflow:hidden; position:relative; }
+.card-cell { background:var(--bg2); border:0.5px solid var(--border); border-left:2px solid var(--border2); border-radius:var(--rsm); padding:11px; cursor:pointer; transition:border-color .12s,box-shadow .12s; display:flex; flex-direction:column; gap:5px; height:190px; overflow:hidden; position:relative; box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .card-cell.used { background:#eae8e2; border-color:#c8c4bc; opacity:.82; }
 .card-cell.used .card-cell-title { color:var(--text2); }
 .card-used-badge { display:inline-flex; align-items:center; gap:4px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:9px; color:#888; background:#dedad3; border:0.5px solid #c4c0b8; border-radius:20px; padding:1px 7px; flex-shrink:0; }
 .card-used-badge.in-detail { font-size:11px; padding:3px 10px; cursor:pointer; }
 .card-used-badge.in-detail:hover { background:#d0ccc4; }
-.card-cell:hover { border-left-color:var(--accent-m); }
+.card-cell:hover { border-color:var(--border2); box-shadow:0 2px 8px rgba(0,0,0,.07); }
 .card-cell-title { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:13px; font-weight:700; color:var(--text); line-height:1.4; flex-shrink:0; }
 .card-cell-body { flex:1; overflow:hidden; }
 .card-cell-line { font-size:11px; line-height:1.65; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -854,7 +872,7 @@ body {
 .card-detail-back:hover { opacity:.7; }
 /* カード詳細ボディ：カードスタイル */
 .card-detail-body { flex:1; overflow-y:auto; padding:1.25rem 1.5rem 3rem; background:var(--bg3); }
-.card-detail-card { background:var(--bg2); border:0.5px solid var(--border); border-radius:12px; box-shadow:0 4px 24px rgba(0,0,0,.08); max-width:720px; margin:0 auto; padding:2rem 2.5rem 2.5rem; }
+.card-detail-card { background:var(--bg2); border:0.5px solid var(--border); border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,.05); max-width:720px; margin:0 auto; padding:2rem 2.5rem 2.5rem; }
 .card-detail-card-title { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:22px; font-weight:700; color:var(--text); margin-bottom:.75rem; line-height:1.3; }
 .card-detail-card-meta { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:1rem; padding-bottom:1rem; border-bottom:0.5px solid var(--border); }
 .card-detail-card-images { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:1rem; }
@@ -877,13 +895,13 @@ body {
 /* カード選択 */
 .card-cell.selected { border-left-color:var(--accent); border-color:var(--accent-m); }
 /* メディアカード：スレートグレー */
-.card-cell.source-card { background:var(--source-l); border-color:var(--source-m); border-left-color:var(--source); }
-.card-cell.source-card:hover { border-color:var(--source); }
+.card-cell.source-card { background:var(--source-l); border-color:var(--source-m); border-left:2px solid var(--source); }
+.card-cell.source-card:hover { border-color:var(--source-m); box-shadow:0 2px 8px rgba(90,100,120,.08); }
 .card-cell.source-card .card-cell-title { color:var(--source); }
 .card-cell.source-card .card-cell-fade { background:linear-gradient(transparent,var(--source-l)); }
 /* スクラップカード：グリーン */
-.card-cell.scrap-card { background:#f4f8f4; border-color:#b8d4b8; border-left-color:#4a7a52; }
-.card-cell.scrap-card:hover { border-color:#4a7a52; }
+.card-cell.scrap-card { background:#f4f8f4; border-color:#b8d4b8; border-left:2px solid #4a7a52; }
+.card-cell.scrap-card:hover { border-color:#b8d4b8; box-shadow:0 2px 8px rgba(60,107,70,.08); }
 .card-cell.scrap-card .card-cell-title { color:#2e5235; }
 .card-cell.scrap-card .card-cell-fade { background:linear-gradient(transparent,#f4f8f4); }
 .source-badge { display:inline-flex; align-items:center; gap:3px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:9px; color:var(--source); background:var(--source-l); border:0.5px solid var(--source-m); border-radius:20px; padding:1px 7px; flex-shrink:0; }
@@ -1045,6 +1063,7 @@ body {
 .bsky-post-status.ok { background:var(--teal-l); color:var(--teal); }
 .bsky-post-status.err { background:var(--red-l); color:var(--red); }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 </head>
 <body>
 
@@ -1069,8 +1088,10 @@ body {
 <!-- ── Topbar ── -->
 <div class="topbar">
   <div class="app-name">ThinkNotes</div>
-  <!-- モバイル専用：Bsky設定ボタン -->
-  <button id="mobileBskyTopBtn" onclick="openBskySettings()" style="display:none;padding:5px 10px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-size:12px;color:var(--text2);cursor:pointer;white-space:nowrap;">🦋</button>
+  <!-- モバイル専用：⋯ メニュー -->
+  <div id="mobileTopBtns" style="display:none;align-items:center;gap:5px;margin-left:auto;">
+    <button onclick="toggleUserMenu()" style="padding:4px 10px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:20px;font-size:13px;color:var(--text2);cursor:pointer;">⋯</button>
+  </div>
   <div class="phase-steps" id="mainNav">
     <div class="nav-group g-log">
       <div class="nav-group-label">つぶやく・閲覧する</div>
@@ -1105,14 +1126,20 @@ body {
     </div>
     <div class="topbar-sep"></div>
     <div class="sync-dot" id="syncDot" title="保存状態"></div>
-    <a href="info.html" style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text3);text-decoration:none;padding:2px 8px;border:0.5px solid var(--border2);border-radius:20px;" title="このアプリについて">ℹ️ 概要</a>
-    <div class="user-badge" id="userBadge" style="display:none">
-      <span id="userEmail" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
-      <button class="logout-btn" onclick="exportBackup()" title="データをバックアップ" style="border-color:var(--border2)">💾 バックアップ</button>
-      <button class="logout-btn" onclick="showDiag()" title="診断" id="diagBtn">🔍 診断</button>
-      <button class="logout-btn" onclick="forceSyncFromSupabase()" title="Supabaseから再読み込み" id="syncBtn">🔄 同期</button>
-      <button class="logout-btn" onclick="openBskySettings()" id="bskySettingsBtn" title="Bluesky連携設定">🦋 Bsky設定</button>
-      <button class="logout-btn" onclick="signOut()">ログアウト</button>
+    <div class="user-badge" id="userBadge" style="display:none;position:relative;">
+      <span id="userEmail" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text2);"></span>
+      <button onclick="toggleUserMenu()" id="userMenuBtn" style="padding:4px 10px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:20px;font-size:12px;cursor:pointer;color:var(--text2);">⋯</button>
+      <!-- ドロップダウンメニュー -->
+      <div id="userMenuDropdown" style="display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:160px;z-index:500;overflow:hidden;">
+        <button onclick="quickSyncUp();closeUserMenu()" class="user-menu-item" style="color:#3d6b45;" id="syncUpBtn">⬆ このデバイスから送る</button>
+        <button onclick="quickSyncDown();closeUserMenu()" class="user-menu-item" style="color:var(--source);" id="syncDownBtn">⬇ 受け取る</button>
+        <div style="border-top:0.5px solid var(--border);margin:2px 0;"></div>
+        <button onclick="exportBackup();closeUserMenu()" class="user-menu-item">💾 バックアップ</button>
+        <button onclick="showDiag();closeUserMenu()" class="user-menu-item">🔍 診断</button>
+        <button onclick="openBskySettings();closeUserMenu()" class="user-menu-item">🦋 Bsky設定</button>
+        <div style="border-top:0.5px solid var(--border);margin:2px 0;"></div>
+        <button onclick="signOut()" class="user-menu-item" style="color:var(--red);">ログアウト</button>
+      </div>
     </div>
     <div class="search-wrap" id="searchWrap">
       <span class="search-icon">🔍</span>
@@ -1340,34 +1367,32 @@ body {
           <div class="editor-toolbar">
             <input class="editor-title-in" id="editorTitle" placeholder="タイトル" oninput="saveNoteTitle()">
             <div class="et-sep"></div>
-            <button class="et-btn primary" onclick="openNoteCardPicker()">🗂️ カードから作成</button>
+<button class="et-btn primary" onclick="openNoteCardPicker()">🗂️ カードから作成</button>
             <button class="et-btn danger" onclick="deleteCurrentNote()">削除</button>
           </div>
           <div class="editor-stats-bar">
             <div class="stat-pill"><span>文字数</span><span class="stat-pill-val" id="statChars">0</span></div>
-            <div class="stat-pill"><span>段落数</span><span class="stat-pill-val" id="statParas">0</span></div>
-            <div class="stat-pill" title="1行あたりの文字数（0=制限なし）">
+            <div class="stat-pill"><span>行数</span><span class="stat-pill-val" id="statLines">0</span></div>
+            <div class="stat-pill" style="gap:4px;">
               <span>行幅</span>
-              <input class="stat-line-in" id="lineWidthIn" type="number" value="0" min="0" max="120" step="5" oninput="applyNoteEditorSettings()">
-              <span>字</span>
-            </div>
-            <div class="stat-pill" style="cursor:pointer;" onclick="toggleNoteLineNumbers()" title="行番号の表示切替">
-              <span id="lineNumToggleLabel" style="user-select:none;">行番号 OFF</span>
+              <input id="lineWidthIn" type="number" min="0" max="120" step="4" value="0" style="width:38px;padding:1px 4px;border:0.5px solid var(--border2);border-radius:4px;font-size:11px;font-family:inherit;color:var(--text);background:var(--bg2);outline:none;text-align:center;" oninput="applyLineWidth()">
+              <span>字（0=制限なし）</span>
             </div>
           </div>
           <div class="editor-split">
             <div class="editor-main" style="position:relative;">
-              <!-- シンプルエディタ（段落・カードブロック統合） -->
+              <!-- Markdownエディタ（textarea + プレビュー） -->
               <div id="noteTextWrap" style="flex:1;display:flex;overflow:hidden;">
-                <!-- スクロールコンテナ（行番号＋本文が一緒にスクロール） -->
-                <div id="noteEditorOuter" style="flex:1;overflow-y:auto;display:flex;">
-                  <div id="lineNumbers" style="display:none;padding:1.75rem 0 4rem;font-family:monospace;font-size:14px;line-height:1.9;color:var(--text3);text-align:right;user-select:none;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg3);min-width:3em;padding-right:.5rem;padding-left:.75rem;"></div>
-                  <div id="noteTextEditor"
-                    contenteditable="true"
-                    style="flex:1;padding:1.75rem 2rem 4rem;font-family:'Hiragino Mincho ProN','Yu Mincho',Georgia,serif;font-size:15px;line-height:1.9;color:var(--text);outline:none;white-space:pre-wrap;word-break:break-word;caret-color:var(--accent);"
+                <!-- エディタ -->
+                <div id="noteEditorOuter" style="flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;">
+                  <textarea id="noteTextEditor"
+                    spellcheck="false"
+                    placeholder="書き始める…"
+                    style="flex:1;resize:none;border:none;outline:none;padding:1.5rem 2rem;font-family:'Hiragino Mincho ProN','Yu Mincho',Georgia,serif;font-size:15px;line-height:1.9;color:var(--text);background:var(--bg);caret-color:var(--accent);white-space:pre-wrap;word-break:break-word;"
                     oninput="onNoteTextInput()"
-                    onkeydown="onNoteTextKey(event)">
-                  </div>
+                    onkeydown="onNoteTextKey(event)"
+                    onpaste="onNotePaste(event)"
+                  ></textarea>
                 </div>
               </div>
             </div>
@@ -1685,42 +1710,27 @@ function getStoredSession(){
 }
 
 async function initAuth(){
-  // まずonAuthStateChangeを登録（イベントを取りこぼさないよう先に）
+  // 先にセッションを確認
+  const {data:{session}}=await sb.auth.getSession();
+
+  // onAuthStateChange（ログイン後のトークンリフレッシュ対応）
   sb.auth.onAuthStateChange(async(event,session)=>{
-    if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'){
-      if(session&&!currentUser){
-        currentUser=session.user;showApp();await loadFromSupabase();
-      }
+    if(event==='TOKEN_REFRESHED'&&session&&currentUser){
+      currentUser=session.user; // トークン更新のみ（再ロード不要）
+    } else if(event==='SIGNED_IN'&&session&&!currentUser){
+      currentUser=session.user;showApp();await loadFromSupabase();
     } else if(event==='SIGNED_OUT'){
       currentUser=null;showLogin();
     }
   });
 
-  // localStorageのセッションを試みる
-  const stored=getStoredSession();
-  if(stored){
-    try{
-      const {data,error}=await sb.auth.setSession({
-        access_token:stored.access_token,
-        refresh_token:stored.refresh_token||''
-      });
-      if(data?.session){
-        currentUser=data.session.user;
-        showApp();
-        await loadFromSupabase();
-        return;
-      }
-      // access_tokenが切れている場合はrefreshを試みる
-      const {data:rd}=await sb.auth.refreshSession();
-      if(rd?.session){
-        currentUser=rd.session.user;
-        showApp();
-        await loadFromSupabase();
-        return;
-      }
-    }catch(e){console.warn('initAuth error:',e);}
+  if(session){
+    currentUser=session.user;
+    showApp();
+    await loadFromSupabase();
+  } else {
+    showLogin();
   }
-  showLogin();
 }
 function showLogin(){
   document.getElementById('loginOverlay').style.display='flex';
@@ -1731,8 +1741,8 @@ function showApp(){
   const ub=document.getElementById('userBadge');
   ub.style.display='flex';
   document.getElementById('userEmail').textContent=currentUser.email||'';
-  // カレンダー設定をSupabaseから読み込む
   loadCalSettingsFromSupabase();
+  startRealtime();
 }
 async function signInWithPassword(){
   const email=document.getElementById('loginEmail').value.trim();
@@ -1757,78 +1767,200 @@ async function signUpWithPassword(){
   else{msg.textContent='✓ 登録しました。そのままログインされます。';msg.className='login-msg ok';}
 }
 async function signOut(){
-  // Supabaseセッションキャッシュとアプリデータを両方削除
-  Object.keys(localStorage).forEach(k=>{
-    if(k.startsWith('sb-')||k.startsWith('tn_'))localStorage.removeItem(k);
-  });
-  try{await sb.auth.signOut();}catch(e){}
+  stopRealtime();
+  clearTimeout(saveTimer);
+  try{await sb.auth.signOut();}catch(e){console.warn('signOut:',e);}
+  // セッショントークンを強制削除
+  Object.keys(localStorage).filter(k=>k.startsWith('sb-')).forEach(k=>localStorage.removeItem(k));
+  sessionStorage.clear();
   location.reload();
 }
 
 async function loadFromSupabase(force=false){
   if(!currentUser)return;
 
-  // ① ログイン直後（force=true or localStorageにデータがある場合）は
-  //    まずlocalをクリアしてからSupabaseで上書き（別ユーザーのデータを守る）
-  if(force){
-    // localStorageのアプリデータをクリアしてからSupabaseで上書き
-    Object.keys(localStorage).forEach(k=>{if(k.startsWith('tn_'))localStorage.removeItem(k);});
-    posts=[];notes=[];outlines=[];
-  } else {
-    // 通常時はlocalStorageを即表示（画面が空にならないように）
-    loadLocal();
+  // ローカルを読む（DEMOなし）
+  let localPosts=[], localNotes=[], localOutlines=[];
+  try{localPosts=JSON.parse(localStorage.getItem(KP)||'[]');}catch(e){}
+  try{localNotes=JSON.parse(localStorage.getItem(KN)||'[]');}catch(e){}
+  try{localOutlines=JSON.parse(localStorage.getItem(KO)||'[]');}catch(e){}
+
+  if(localPosts.length>0){
+    posts=localPosts;notes=localNotes;outlines=localOutlines;
+    posts.forEach(p=>{if(!p.replies)p.replies=[];});
+    setSyncDot('saved');
     renderSidebar();renderFeed();
-  }
-  setSyncDot('syncing');
-
-  // ② Supabaseから読み込む
-  const {data,error}=await sb.from('thinkdata')
-    .select('data_key,data_value').eq('user_id',currentUser.id);
-
-  if(error){
-    console.error('Supabase load error:',error);
-    setSyncDot('');
     return;
   }
 
-  const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+  // ローカルが空の場合のみSupabaseから取得
+  setSyncDot('syncing');
+  try{
+    const {data,error}=await sb.from('thinkdata')
+      .select('data_key,data_value').eq('user_id',currentUser.id);
+    if(!error&&data){
+      const map={};data.forEach(r=>{map[r.data_key]=r.data_value;});
+      if(map.posts?.length){
+        posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
+        posts.forEach(p=>{if(!p.replies)p.replies=[];});
+        notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
+        localStorage.setItem(KP,JSON.stringify(posts));
+        localStorage.setItem(KN,JSON.stringify(notes));
+        localStorage.setItem(KO,JSON.stringify(outlines));
+      }
+    }
+  }catch(e){console.warn('load error:',e);}
+  setSyncDot('saved');
+  renderSidebar();renderFeed();
+}
 
-  if(map.posts||map.notes){
-    const sbPosts=map.posts||[];
-    const sbNotes=map.notes||[];
-    const sbOutlines=map.outlines||[];
-    // 保存失敗中はローカルデータを守る（上書きしない）
-    if(!lastSaveOk&&!force){
-      console.warn('Last save failed - keeping local data');
-      setSyncDot('');
+
+async function _rawSave(p,n,o){
+  if(!currentUser)return;
+  const uid=currentUser.id,ts=new Date().toISOString();
+  await sb.from('thinkdata').upsert([
+    {user_id:uid,data_key:'posts',   data_value:p,updated_at:ts},
+    {user_id:uid,data_key:'notes',   data_value:n,updated_at:ts},
+    {user_id:uid,data_key:'outlines',data_value:o,updated_at:ts},
+  ],{onConflict:'user_id,data_key'});
+}
+
+async function syncFromSupabase(){
+  if(!currentUser){alert('ログインが必要です');return;}
+  const btn=document.getElementById('syncDownBtn');
+  const mBtn=document.getElementById('mobileSyncDownBtn');
+  [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'…':'受信中…';b.disabled=true;}});
+  try{
+    const {data,error}=await sb.from('thinkdata')
+      .select('data_key,data_value').eq('user_id',currentUser.id);
+    if(error)throw error;
+    const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+    if(!map.posts?.length){
+      [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'⬇':'⬇ 受け取る';b.disabled=false;}});
+      alert('Supabaseにデータがありません。別デバイスで「⬆ 送る」を押してください。');
       return;
     }
-    // 強制同期か、Supabaseの方がデータが多い場合のみ上書き
-    if(force||sbPosts.length>=posts.length){
-      posts=sbPosts;
-      notes=sbNotes;
-      outlines=sbOutlines;
-    }
-  } else if(posts.length>0){
-    // Supabaseが空 → localStorageをアップロード
-    await saveToSupabase();
+    posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
+    posts.forEach(p=>{if(!p.replies)p.replies=[];});
+    notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
+    localStorage.setItem(KP,JSON.stringify(posts));
+    localStorage.setItem(KN,JSON.stringify(notes));
+    localStorage.setItem(KO,JSON.stringify(outlines));
     setSyncDot('saved');
-    return;
+    renderSidebar();renderFeed();
+    [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'✅':'✅ 受信完了（'+posts.length+'件）';setTimeout(()=>{b.textContent=b===mBtn?'⬇':'⬇ 受け取る';b.disabled=false;},3000);}});
+  }catch(e){
+    [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'⬇':'⬇ 受け取る';b.disabled=false;}});
+    alert('エラー: '+e.message);
   }
+}
 
-  // migrate
-  notes.forEach(n=>{
-    if(!n.items)n.items=[];if(!n.stickies)n.stickies=[];
-    if(!n.paragraphs)n.paragraphs=n.body?n.body.split('\n').filter(l=>l.trim()):[];
-  });
+async function _rawSave(p,n,o){
+  if(!currentUser)return;
+  const uid=currentUser.id,ts=new Date().toISOString();
+  await sb.from('thinkdata').upsert([
+    {user_id:uid,data_key:'posts',   data_value:p,updated_at:ts},
+    {user_id:uid,data_key:'notes',   data_value:n,updated_at:ts},
+    {user_id:uid,data_key:'outlines',data_value:o,updated_at:ts},
+  ],{onConflict:'user_id,data_key'});
+}
+
+async function syncFromSupabase(){
+  if(!currentUser){alert('ログインが必要です');return;}
+  setSyncDot('syncing');
+  const {data,error}=await sb.from('thinkdata')
+    .select('data_key,data_value').eq('user_id',currentUser.id);
+  if(error){alert('エラー: '+error.message);setSyncDot('');return;}
+  const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+  if(!map.posts?.length){alert('Supabaseにデータがありません');setSyncDot('');return;}
+  posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
   posts.forEach(p=>{if(!p.replies)p.replies=[];});
-
+  const now=Date.now();
   localStorage.setItem(KP,JSON.stringify(posts));
   localStorage.setItem(KN,JSON.stringify(notes));
   localStorage.setItem(KO,JSON.stringify(outlines));
-
+  localStorage.setItem('tn_saved_at',String(now));
   setSyncDot('saved');
   renderSidebar();renderFeed();
+  alert('Supabaseから読み込みました（投稿'+posts.length+'件）');
+}
+
+async function _rawSave(p,n,o){
+  if(!currentUser)return;
+  const uid=currentUser.id,ts=new Date().toISOString();
+  await sb.from('thinkdata').upsert([
+    {user_id:uid,data_key:'posts',   data_value:p,updated_at:ts},
+    {user_id:uid,data_key:'notes',   data_value:n,updated_at:ts},
+    {user_id:uid,data_key:'outlines',data_value:o,updated_at:ts},
+  ],{onConflict:'user_id,data_key'});
+}
+
+async function syncFromSupabase(){
+  if(!currentUser){alert('ログインが必要です');return;}
+  setSyncDot('syncing');
+  const {data,error}=await sb.from('thinkdata')
+    .select('data_key,data_value').eq('user_id',currentUser.id);
+  if(error){alert('エラー: '+error.message);setSyncDot('');return;}
+  const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+  if(!map.posts?.length){alert('Supabaseにデータがありません');setSyncDot('');return;}
+  posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
+  posts.forEach(p=>{if(!p.replies)p.replies=[];});
+  localStorage.setItem(KP,JSON.stringify(posts));
+  localStorage.setItem(KN,JSON.stringify(notes));
+  localStorage.setItem(KO,JSON.stringify(outlines));
+  setSyncDot('saved');
+  renderSidebar();renderFeed();
+  alert('Supabaseから読み込みました（投稿'+posts.length+'件）');
+}
+
+async function _rawSaveToSupabase(p,n,o){
+  if(!currentUser)return;
+  try{
+    await sb.from('thinkdata').upsert([
+      {user_id:currentUser.id,data_key:'posts',   data_value:p,updated_at:new Date().toISOString()},
+      {user_id:currentUser.id,data_key:'notes',   data_value:n,updated_at:new Date().toISOString()},
+      {user_id:currentUser.id,data_key:'outlines',data_value:o,updated_at:new Date().toISOString()},
+    ],{onConflict:'user_id,data_key'});
+  }catch(e){console.error('_rawSaveToSupabase error:',e);}
+}
+
+// 手動同期：Supabase→ローカル（強制上書き）
+async function syncFromSupabase(){
+  if(!currentUser){alert('ログインが必要です');return;}
+  setSyncDot('syncing');
+  const {data,error}=await sb.from('thinkdata')
+    .select('data_key,data_value').eq('user_id',currentUser.id);
+  if(error){alert('取得エラー: '+error.message);setSyncDot('');return;}
+  const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+  if(!map.posts?.length){alert('Supabaseにデータがありません');setSyncDot('');return;}
+  posts=map.posts||[];notes=map.notes||[];outlines=map.outlines||[];
+  posts.forEach(p=>{if(!p.replies)p.replies=[];});
+  localStorage.setItem(KP,JSON.stringify(posts));
+  localStorage.setItem(KN,JSON.stringify(notes));
+  localStorage.setItem(KO,JSON.stringify(outlines));
+  setSyncDot('saved');
+  renderSidebar();renderFeed();
+  alert('Supabaseから読み込みました（投稿'+posts.length+'件）');
+}
+
+// 手動同期：Supabase→ローカル（強制上書き）
+async function syncFromSupabase(){
+  if(!currentUser){alert('ログインが必要です');return;}
+  setSyncDot('syncing');
+  const {data,error}=await sb.from('thinkdata')
+    .select('data_key,data_value').eq('user_id',currentUser.id);
+  if(error){alert('取得エラー: '+error.message);setSyncDot('');return;}
+  const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+  if(!map.posts?.length){alert('Supabaseにデータがありません');setSyncDot('');return;}
+  posts=map.posts||[];notes=map.notes||[];outlines=map.outlines||[];
+  posts.forEach(p=>{if(!p.replies)p.replies=[];});
+  notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
+  localStorage.setItem(KP,JSON.stringify(posts));
+  localStorage.setItem(KN,JSON.stringify(notes));
+  localStorage.setItem(KO,JSON.stringify(outlines));
+  setSyncDot('saved');
+  renderSidebar();renderFeed();
+  alert(`Supabaseから読み込みました（投稿${posts.length}件）`);
 }
 
 async function showDiag(){
@@ -1836,34 +1968,83 @@ async function showDiag(){
   if(!panel){
     panel=document.createElement('div');
     panel.id='diagPanel';
-    panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#fff;border:2px solid #7a5c1e;border-radius:12px;padding:20px;width:90vw;max-width:400px;font-family:monospace;font-size:13px;max-height:80vh;overflow-y:auto;';
+    panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#fff;border:2px solid #7a5c1e;border-radius:12px;padding:20px;width:92vw;max-width:480px;font-family:monospace;font-size:12px;max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.2);';
     document.body.appendChild(panel);
   }
   panel.innerHTML='<div style="font-weight:bold;margin-bottom:8px;">🔍 診断中…</div>';
   const lines=[];
+  const btn=s=>`<button onclick="${s}" style="padding:4px 14px;background:#7a5c1e;color:#fff;border:none;border-radius:20px;cursor:pointer;font-size:11px;margin:4px 4px 4px 0;">`; 
   try{
-    const stored=getStoredSession();
-    lines.push('ローカルセッション: '+(stored?'✅ あり':'❌ なし'));
-    lines.push('currentUser: '+(currentUser?currentUser.email:'null'));
-    lines.push('ローカル投稿数: '+posts.length);
+    lines.push('👤 '+( currentUser?currentUser.email:'未ログイン'));
+
+    // ローカルのタイムスタンプ
+    let localP=[],localN=[],localO=[];
+    try{localP=JSON.parse(localStorage.getItem(KP)||'[]');}catch(e){}
+    try{localN=JSON.parse(localStorage.getItem(KN)||'[]');}catch(e){}
+    try{localO=JSON.parse(localStorage.getItem(KO)||'[]');}catch(e){}
+    const latestLocal=Math.max(0,...localP.map(p=>p.createdAt||0),...localO.map(o=>o.updatedAt||0));
+    lines.push(`📱 ローカル: 投稿${localP.length}件 / アウトライン${localO.length}件`);
+    lines.push(`📱 ローカル最新: ${latestLocal?new Date(latestLocal).toLocaleString():'なし'}`);
+
     if(currentUser){
       const {data,error}=await sb.from('thinkdata')
         .select('data_key,data_value').eq('user_id',currentUser.id);
-      if(error){lines.push('読込エラー: '+error.message);}
+      if(error){lines.push('❌ 読込エラー: '+error.message);}
       else{
         const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
-        lines.push('Supabase投稿数: '+(map.posts?.length??'なし'));
-        lines.push('Supabaseノート数: '+(map.notes?.length??'なし'));
+        const sbP=map.posts||[],sbO=map.outlines||[];
+        const latestSb=Math.max(0,...sbP.map(p=>p.createdAt||0),...sbO.map(o=>o.updatedAt||0));
+        lines.push(`☁️ Supabase: 投稿${sbP.length}件 / アウトライン${sbO.length}件`);
+        lines.push(`☁️ Supabase最新: ${latestSb?new Date(latestSb).toLocaleString():'なし'}`);
+        if(latestLocal>latestSb) lines.push('⚠️ ローカルの方が新しい！');
+        else if(latestSb>latestLocal) lines.push('⚠️ Supabaseの方が新しい！');
+        else lines.push('✅ タイムスタンプ一致');
       }
-      const {error:we}=await sb.from('thinkdata').upsert(
-        {user_id:currentUser.id,data_key:'_test',data_value:{t:Date.now()},updated_at:new Date().toISOString()},
-        {onConflict:'user_id,data_key'}
-      );
-      lines.push('書込テスト: '+(we?'❌ '+we.message:'✅ 成功'));
     }
   }catch(e){lines.push('例外: '+e.message);}
-  panel.innerHTML=lines.map(l=>`<div style="padding:3px 0;border-bottom:1px solid #eee;">${l}</div>`).join('')
-    +'<button onclick="document.getElementById(\'diagPanel\').remove()" style="margin-top:12px;padding:6px 20px;background:#7a5c1e;color:#fff;border:none;border-radius:20px;cursor:pointer;">閉じる</button>';
+  panel.innerHTML=
+    lines.map(l=>`<div style="padding:4px 0;border-bottom:0.5px solid #eee;">${l}</div>`).join('')
+    +'<div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;">'
+    +btn('diagForcePush()')+'⬆ ローカル→Supabase</button>'
+    +btn('syncFromSupabase()')+'⬇ Supabase→ローカル</button>'
+    +btn('diagCleanImages()')+'🧹 画像データを除去</button>'
+    +'</div>'
+    +'<button onclick="document.getElementById(\'diagPanel\').remove()" style="margin-top:10px;padding:5px 16px;background:var(--bg3);color:var(--text2);border:0.5px solid var(--border2);border-radius:20px;cursor:pointer;font-size:11px;">閉じる</button>';
+}
+
+async function diagCleanImages(){
+  document.getElementById('diagPanel')?.remove();
+  // localStorageのpostsからbase64画像を除去
+  const p2=JSON.parse(localStorage.getItem(KP)||'[]');
+  const before=JSON.stringify(p2).length;
+  const cleaned=p2.map(p=>({
+    ...p,
+    images:(p.images||[]).filter(s=>!s.startsWith('data:')),
+    replies:(p.replies||[]).map(r=>({...r,images:(r.images||[]).filter(s=>!s.startsWith('data:'))}))
+  }));
+  localStorage.setItem(KP,JSON.stringify(cleaned));
+  const after=JSON.stringify(cleaned).length;
+  const saved=((before-after)/1024).toFixed(0);
+  alert(`🧹 完了！ ${saved}KB を解放しました。\n次に「⬇ 受け取る」でSupabaseから画像付きデータを取得してください。`);
+}
+async function diagForcePush(){
+  document.getElementById('diagPanel')?.remove();
+  await saveToSupabase();
+  alert('ローカルデータをSupabaseにアップロードしました');
+}
+
+async function diagForcePull(){
+  document.getElementById('diagPanel')?.remove();
+  const {data}=await sb.from('thinkdata').select('data_key,data_value').eq('user_id',currentUser.id);
+  const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+  if(!map.posts?.length){alert('Supabaseにデータがありません');return;}
+  posts=map.posts||[];notes=map.notes||[];outlines=map.outlines||[];
+  posts.forEach(p=>{if(!p.replies)p.replies=[];});
+  localStorage.setItem(KP,JSON.stringify(posts));
+  localStorage.setItem(KN,JSON.stringify(notes));
+  localStorage.setItem(KO,JSON.stringify(outlines));
+  renderSidebar();renderFeed();
+  alert('Supabaseからローカルに反映しました（投稿'+posts.length+'件）');
 }
 
 async function forceSyncFromSupabase(){
@@ -1878,53 +2059,156 @@ let lastSaveOk=true; // 最後の保存が成功したか
 
 async function saveToSupabase(){
   if(!currentUser)return;
+  if(!posts.length&&!notes.length){
+    console.warn('saveToSupabase: データが空のためスキップ');
+    return;
+  }
   setSyncDot('syncing');
   const uid=currentUser.id;
   const ts=new Date().toISOString();
+  const rows=[
+    {user_id:uid,data_key:'posts',   data_value:posts,   updated_at:ts},
+    {user_id:uid,data_key:'notes',   data_value:notes,   updated_at:ts},
+    {user_id:uid,data_key:'outlines',data_value:outlines,updated_at:ts},
+  ];
   try{
-    for(const [key,val] of [['posts',posts],['notes',notes],['outlines',outlines]]){
-      const {error}=await sb.from('thinkdata').upsert(
-        {user_id:uid,data_key:key,data_value:val,updated_at:ts},
-        {onConflict:'user_id,data_key'}
-      );
-      if(error)throw error;
-    }
+    const {error}=await sb.from('thinkdata')
+      .upsert(rows,{onConflict:'user_id,data_key'});
+    if(error)throw error;
     lastSaveOk=true;
+    _lastSaveTime=Date.now();
     setSyncDot('saved');
+    console.log('✅ Supabase保存完了 投稿'+posts.length+'件');
   }catch(e){
     lastSaveOk=false;
-    console.error('saveToSupabase error:',e);
-    // 保存失敗を赤で表示
-    const dot=document.getElementById('syncDot');
-    if(dot){dot.style.background='var(--red)';dot.title='保存失敗（ローカルには保存済み）: '+e.message;}
-    // 再認証して再試行
-    try{
-      const {data:rd}=await sb.auth.refreshSession();
-      if(rd?.session){
-        currentUser=rd.session.user;
-        // 再試行
-        for(const [key,val] of [['posts',posts],['notes',notes],['outlines',outlines]]){
-          await sb.from('thinkdata').upsert(
-            {user_id:currentUser.id,data_key:key,data_value:val,updated_at:ts},
-            {onConflict:'user_id,data_key'}
-          );
-        }
-        lastSaveOk=true;
-        setSyncDot('saved');
-      }
-    }catch(e2){console.error('retry save failed:',e2);}
+    console.error('saveToSupabase error:',e.message);
+    setSyncDot('error');
   }
 }
 
 function setSyncDot(state){
-  const dot=document.getElementById('syncDot');
-  if(!dot)return;
+  const dot=document.getElementById('syncDot');if(!dot)return;
   dot.className='sync-dot'+(state?' '+state:'');
-  dot.title=state==='syncing'?'同期中…':state==='saved'?'保存済み':'';
-  if(state==='saved')setTimeout(()=>{if(dot.classList.contains('saved'))dot.className='sync-dot';},2000);
+  const titles={syncing:'保存中…',saved:'保存済み',error:'保存失敗 — クリックで再試行'};
+  dot.title=titles[state]||'';
+  if(state==='saved')setTimeout(()=>{if(dot.classList.contains('saved'))dot.className='sync-dot';},3000);
+  dot.onclick=state==='error'?()=>{dot.onclick=null;sbRun(saveToSupabase);}:null;
+  dot.style.cursor=state==='error'?'pointer':'';
 }
 
-// getSession にタイムアウトを付けるラッパー
+
+// ── ワンボタン同期 ──────────────────────────────────────────
+async function quickSyncUp(){
+  if(!currentUser){
+    const {data:{session}}=await sb.auth.getSession();
+    if(session)currentUser=session.user;
+    else{alert('ログインが必要です');return;}
+  }
+  if(!posts.length){alert('送るデータがありません');return;}
+  const btn=document.getElementById('syncUpBtn');
+  const mBtn=document.getElementById('mobileSyncUpBtn');
+  [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'…':'送信中…';b.disabled=true;}});
+  try{
+    await saveToSupabase();
+    [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'✅':'✅ 送信完了';setTimeout(()=>{b.textContent=b===mBtn?'⬆':'⬆ 送る';b.disabled=false;},2000);}});
+  }catch(e){
+    [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'⬆':'⬆ 送る';b.disabled=false;}});
+    alert('エラー: '+e.message);
+  }
+}
+
+async function quickSyncDown(){
+  // currentUserがnullでもセッションから取得を試みる
+  if(!currentUser){
+    const {data:{session}}=await sb.auth.getSession();
+    if(session)currentUser=session.user;
+    else{alert('ログインが必要です');return;}
+  }
+  const btn=document.getElementById('syncDownBtn');
+  const mBtn=document.getElementById('mobileSyncDownBtn');
+  [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'…':'受信中…';b.disabled=true;}});
+  try{
+    const {data,error}=await sb.from('thinkdata')
+      .select('data_key,data_value').eq('user_id',currentUser.id);
+    if(error)throw error;
+    const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+    if(!map.posts?.length){
+      [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'⬇':'⬇ 受け取る';b.disabled=false;}});
+      alert('Supabaseにデータがありません。別デバイスで「⬆ 送る」を押してください。');
+      return;
+    }
+    posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
+    posts.forEach(p=>{if(!p.replies)p.replies=[];});
+    notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
+    localStorage.setItem(KP,JSON.stringify(posts));
+    localStorage.setItem(KN,JSON.stringify(notes));
+    localStorage.setItem(KO,JSON.stringify(outlines));
+    renderSidebar();renderFeed();
+    [btn,mBtn].forEach(b=>{if(b){
+      b.textContent=b===mBtn?'✅':'✅ '+posts.length+'件';
+      setTimeout(()=>{b.textContent=b===mBtn?'⬇':'⬇ 受け取る';b.disabled=false;},3000);
+    }});
+  }catch(e){
+    [btn,mBtn].forEach(b=>{if(b){b.textContent=b===mBtn?'⬇':'⬇ 受け取る';b.disabled=false;}});
+    alert('エラー: '+e.message);
+  }
+}
+// ─── Supabase Realtime（他デバイスの変更を自動受信） ─────────
+let _realtimeChannel=null;
+let _lastSaveTime=0;
+
+function startRealtime(){
+  if(!currentUser||_realtimeChannel)return;
+  _realtimeChannel=sb.channel('thinkdata-changes-'+currentUser.id)
+    .on('postgres_changes',{
+      event:'*',schema:'public',table:'thinkdata',
+      filter:`user_id=eq.${currentUser.id}`
+    },async(payload)=>{
+      // 自分自身の書き込みは無視（3秒以内）
+      if(Date.now()-_lastSaveTime<3000){
+        console.log('📡 Realtime: 自分の書き込みなのでスキップ');
+        return;
+      }
+      console.log('📡 Realtime: 他デバイスからの変更を受信',payload.eventType);
+      setSyncDot('syncing');
+      await _pullFromSupabase();
+    })
+    .subscribe((status,err)=>{
+      console.log('📡 Realtime status:',status,err||'');
+      if(status==='SUBSCRIBED'){
+        console.log('✅ Realtime購読成功');
+      } else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
+        console.warn('⚠️ Realtime購読失敗:',status);
+        // 5秒後に再試行
+        _realtimeChannel=null;
+        setTimeout(startRealtime,5000);
+      }
+    });
+}
+
+async function _pullFromSupabase(){
+  if(!currentUser)return;
+  const {data,error}=await sb.from('thinkdata')
+    .select('data_key,data_value').eq('user_id',currentUser.id);
+  if(error||!data)return;
+  const map={};data.forEach(r=>{map[r.data_key]=r.data_value;});
+  if(!map.posts?.length)return;
+  posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
+  posts.forEach(p=>{if(!p.replies)p.replies=[];});
+  notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
+  localStorage.setItem(KP,JSON.stringify(posts));
+  localStorage.setItem(KN,JSON.stringify(notes));
+  localStorage.setItem(KO,JSON.stringify(outlines));
+  setSyncDot('saved');
+  renderSidebar();renderFeed();
+}
+
+let _sbQueue=Promise.resolve();
+function sbRun(fn){
+  _sbQueue=_sbQueue.then(()=>fn().catch(e=>console.warn('sbRun error:',e)));
+  return _sbQueue;
+}
+
 async function getSessionWithTimeout(ms=5000){
   return Promise.race([
     sb.auth.getSession(),
@@ -2173,12 +2457,17 @@ function selectLibraryImg(src){
     if(!ol.images)ol.images=[];
     if(!ol.images.includes(src))ol.images.push(src);
     ol.updatedAt=Date.now();save();wfRenderImgStrip();
-  } else if(imgLibraryTarget==='card'){
+  } else if(imgLibraryTarget==='card'||imgLibraryTarget==='scrap'){
     const ol=outlines.find(x=>x.id===currentCardOutlineId);if(!ol)return;
-    if(!ol.images)ol.images=[];
-    if(!ol.images.includes(src))ol.images.push(src);
-    ol.updatedAt=Date.now();save();
-    openCardDetail(currentCardOutlineId);
+    if(ol.isScrap){
+      ol.scrapImage=src;ol.updatedAt=Date.now();save();
+      openCardDetail(currentCardOutlineId);
+    } else {
+      if(!ol.images)ol.images=[];
+      if(!ol.images.includes(src))ol.images.push(src);
+      ol.updatedAt=Date.now();save();
+      openCardDetail(currentCardOutlineId);
+    }
   }
 }
 
@@ -2591,8 +2880,9 @@ function openCardDetail(outlineId){
       <div style="max-width:720px;margin:.5rem auto 0;display:flex;gap:5px;flex-wrap:wrap;align-items:center;padding:4px 0;">
         <input class="card-label-in" id="cardLabelIn" placeholder="ラベルを追加…" style="flex:1;min-width:80px;max-width:160px;" onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();addCardLabel();}">
         <button class="card-img-upload-btn" onclick="addCardLabel()" style="font-size:11px;">＋</button>
-        <button onclick="document.getElementById('scrapImgFile').click()" class="card-img-upload-btn" style="font-size:11px;" title="画像を追加">🖼️</button>
-        <input type="file" id="scrapImgFile" accept="image/*" style="display:none" onchange="onScrapImageFile(event,'${ol.id}')">
+        <button onclick="document.getElementById('scrapImgFile').click()" class="card-img-upload-btn" style="font-size:11px;" title="画像をアップロード">🖼️</button>
+        <input type="file" id="scrapImgFile" accept="image/*" style="display:none" onchange="onScrapImageFile(event)">
+        <button onclick="openImgLibrary('scrap')" class="card-img-upload-btn" style="font-size:11px;" title="ライブラリから選択">📂</button>
         <button onclick="deleteScrapCard()" style="margin-left:auto;padding:4px 12px;background:none;color:var(--red);border:0.5px solid var(--red);border-radius:20px;font-size:11px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;cursor:pointer;">🗑</button>
       </div>
       <div id="cardLinkedPostsSection" style="max-width:720px;margin:.5rem auto 0;"></div>`;
@@ -2642,43 +2932,51 @@ function openCardDetail(outlineId){
       ${ol.usedAt?`<span class="card-used-badge in-detail" onclick="toggleCardUsed()" title="クリックで解除">✓ ${esc(ol.usedNote||'成仏済')} ✕</span>`:''}
     </div>
     ${ol.isSource?`
-    <div class="source-detail-section">
-      <div class="source-detail-label">📎 メディア情報</div>
-      <div style="display:flex;flex-direction:column;gap:5px;">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:160px;">
-            <div style="font-size:9px;color:var(--text3);font-family:'Hiragino Kaku Gothic ProN',sans-serif;margin-bottom:2px;">サイト・配信URL</div>
-            <input class="source-detail-input" id="sourceUrlIn" value="${esc(ol.sourceUrl||'')}" placeholder="https://…" onblur="saveSourceMeta();autoFetchSourceUrl(this.value)" style="font-size:11px;padding:4px 8px;">
+    <div class="source-detail-section" id="sourceDetailSection">
+      <div onclick="toggleSourceDetail()" style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:2px 0;">
+        ${ol.sourceImage?'<img src="'+esc(ol.sourceImage)+'" style="max-width:48px;max-height:32px;width:auto;height:auto;object-fit:contain;border-radius:3px;border:0.5px solid var(--source-m);flex-shrink:0;background:var(--source-l);" onerror="this.style.display=\'none\'">':''}
+        <span class="source-detail-label" style="flex:1;">📎 メディア情報
+          <span style="font-weight:400;color:var(--text3);font-size:10px;margin-left:6px;">${ol.sourceUrl?(()=>{try{return new URL(ol.sourceUrl).hostname.replace(/^www\./,'');}catch{return '';}})():''}</span>
+          ${(ol.sourceSubItems||[]).length?'<span style="font-weight:400;color:var(--text3);font-size:10px;margin-left:4px;">· '+(ol.sourceSubItems||[]).length+'件</span>':''}
+        </span>
+        <span id="sourceDetailToggleIcon" style="font-size:10px;color:var(--text3);">▸</span>
+      </div>
+      <div id="sourceDetailBody" style="display:none;margin-top:8px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:160px;">
+              <div style="font-size:9px;color:var(--text3);font-family:'Hiragino Kaku Gothic ProN',sans-serif;margin-bottom:2px;">サイト・配信URL</div>
+              <input class="source-detail-input" id="sourceUrlIn" value="${esc(ol.sourceUrl||'')}" placeholder="https://…" onblur="saveSourceMeta();autoFetchSourceUrl(this.value)" style="font-size:11px;padding:4px 8px;">
+            </div>
+            <div style="flex:1;min-width:120px;">
+              <div style="font-size:9px;color:var(--text3);font-family:'Hiragino Kaku Gothic ProN',sans-serif;margin-bottom:2px;">PDF URL</div>
+              <input class="source-detail-input" id="sourcePdfIn" value="${esc(ol.sourcePdfUrl||'')}" placeholder="https://….pdf" onblur="saveSourceMeta()" style="font-size:11px;padding:4px 8px;">
+            </div>
           </div>
-          <div style="flex:1;min-width:120px;">
-            <div style="font-size:9px;color:var(--text3);font-family:'Hiragino Kaku Gothic ProN',sans-serif;margin-bottom:2px;">PDF URL</div>
-            <input class="source-detail-input" id="sourcePdfIn" value="${esc(ol.sourcePdfUrl||'')}" placeholder="https://….pdf" onblur="saveSourceMeta()" style="font-size:11px;padding:4px 8px;">
+          <input class="source-detail-input" id="sourceMemoIn" value="${esc(ol.sourceMemo||'')}" placeholder="著者・説明・分類など…" onblur="saveSourceMeta()" style="font-size:11px;padding:4px 8px;">
+          <div style="display:flex;gap:5px;align-items:center;">
+            ${ol.sourceImage?`<img src="${esc(ol.sourceImage)}" style="height:36px;width:48px;object-fit:cover;border-radius:var(--rsm);border:0.5px solid var(--source-m);flex-shrink:0;" onerror="this.style.display='none'">`:''}
+            <input class="source-detail-input" id="sourceImageIn" value="${esc(ol.sourceImage||'')}" placeholder="サムネイル画像URL" onblur="saveSourceMeta()" style="font-size:11px;padding:4px 8px;flex:1;">
+            <button onclick="document.getElementById('sourceImgFile').click()" style="padding:3px 8px;background:var(--source-l);color:var(--source);border:0.5px solid var(--source-m);border-radius:20px;font-size:10px;cursor:pointer;white-space:nowrap;">📁</button>
+            <input type="file" id="sourceImgFile" accept="image/*" style="display:none" onchange="onSourceImageFile(event,'${ol.id}')">
           </div>
         </div>
-        <input class="source-detail-input" id="sourceMemoIn" value="${esc(ol.sourceMemo||'')}" placeholder="著者・説明・分類など…" onblur="saveSourceMeta()" style="font-size:11px;padding:4px 8px;">
-        <div style="display:flex;gap:5px;align-items:center;">
-          ${ol.sourceImage?`<img src="${esc(ol.sourceImage)}" style="height:36px;width:48px;object-fit:cover;border-radius:var(--rsm);border:0.5px solid var(--source-m);flex-shrink:0;" onerror="this.style.display='none'">`:''}
-          <input class="source-detail-input" id="sourceImageIn" value="${esc(ol.sourceImage||'')}" placeholder="サムネイル画像URL" onblur="saveSourceMeta()" style="font-size:11px;padding:4px 8px;flex:1;">
-          <button onclick="document.getElementById('sourceImgFile').click()" style="padding:3px 8px;background:var(--source-l);color:var(--source);border:0.5px solid var(--source-m);border-radius:20px;font-size:10px;cursor:pointer;white-space:nowrap;">📁</button>
-          <input type="file" id="sourceImgFile" accept="image/*" style="display:none" onchange="onSourceImageFile(event,'${ol.id}')">
+        <div class="source-detail-label" style="margin-top:8px;">エピソード・サブアイテム</div>
+        <div class="source-sub-list" id="sourceSubList">
+          ${(ol.sourceSubItems||[]).map((si,i)=>`
+            <div class="source-sub-item">
+              <span class="source-sub-label">${esc(si.label)}</span>
+              ${si.url?`<a href="${esc(si.url)}" target="_blank" class="source-sub-url" title="${esc(si.url)}" onclick="event.stopPropagation()">🔗 ${esc((()=>{try{return new URL(si.url).hostname;}catch{return si.url.slice(0,20);}})())}</a>`:''}
+              <button class="source-sub-del" onclick="removeSourceSubItem(${i})">✕</button>
+            </div>`).join('')}
+          <div class="source-sub-add-row">
+            <input class="source-sub-in" id="sourceSubLabelIn" placeholder="ラベル（例：#123「AIの倫理」）" onkeydown="if(event.key==='Enter'&&!event.isComposing)addSourceSubItem()">
+            <input class="source-sub-in" id="sourceSubUrlIn" placeholder="URL（省略可）" style="max-width:160px;" onkeydown="if(event.key==='Enter'&&!event.isComposing)addSourceSubItem()" onblur="autoFetchSubItemUrl(this.value)">
+            <button class="card-img-upload-btn" onclick="addSourceSubItem()" style="white-space:nowrap;">＋ 追加</button>
+          </div>
         </div>
       </div>
-      <div class="source-detail-label" style="margin-top:6px;">エピソード・サブアイテム</div>
-      <div class="source-sub-list" id="sourceSubList">
-        ${(ol.sourceSubItems||[]).map((si,i)=>`
-          <div class="source-sub-item">
-            <span class="source-sub-label">${esc(si.label)}</span>
-            ${si.url?`<a href="${esc(si.url)}" target="_blank" class="source-sub-url" title="${esc(si.url)}" onclick="event.stopPropagation()">🔗 ${esc((()=>{try{return new URL(si.url).hostname;}catch{return si.url.slice(0,20);}})())}</a>`:''}
-            <button class="source-sub-del" onclick="removeSourceSubItem(${i})">✕</button>
-          </div>`).join('')}
-        <div class="source-sub-add-row">
-          <input class="source-sub-in" id="sourceSubLabelIn" placeholder="ラベル（例：#123「AIの倫理」）" onkeydown="if(event.key==='Enter'&&!event.isComposing)addSourceSubItem()">
-          <input class="source-sub-in" id="sourceSubUrlIn" placeholder="URL（省略可）" style="max-width:160px;" onkeydown="if(event.key==='Enter'&&!event.isComposing)addSourceSubItem()" onblur="autoFetchSubItemUrl(this.value)">
-          <button class="card-img-upload-btn" onclick="addSourceSubItem()" style="white-space:nowrap;">＋ 追加</button>
-        </div>
-      </div>
-    </div>`:''}\
-    ${cardImgsHtml}
+    </div>`:''}\n    ${cardImgsHtml}
     ${!ol.isSource?`<div class="card-detail-card-content">${itemsHtml||'<div style="color:var(--text3);font-size:13px;">項目がありません</div>'}</div>`:''}
   </div>
   <!-- 共通フッター -->
@@ -2983,9 +3281,9 @@ function renderScrapGrid11(){
     const hl=sc.scrapHighlights||[];
     const thumb=sc.scrapImage||'';
     return`<div class="card-cell scrap-card" onclick="openCardDetail('${sc.id}')">
-      ${thumb?`<img src="${esc(thumb)}" style="width:100%;height:72px;object-fit:cover;flex-shrink:0;" loading="lazy" onerror="this.style.display='none'">`:''}
-      <div style="font-size:9px;color:#4a7a52;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(sc.scrapSiteName||'')}</div>
-      <div class="card-cell-title" style="color:#2e5235;">${esc(sc.title||'無題')}</div>
+      <div style="font-size:9px;color:#4a7a52;font-family:'Hiragino Kaku Gothic ProN',sans-serif;flex-shrink:0;">${esc(sc.scrapSiteName||'')}</div>
+      <div class="card-cell-title" style="color:#2e5235;flex-shrink:0;">${esc(sc.title||'無題')}</div>
+      ${thumb?`<img src="${esc(thumb)}" style="width:100%;max-height:100px;object-fit:contain;flex-shrink:0;background:#e8f0e8;border-radius:var(--rsm);" loading="lazy" onerror="this.style.display='none'">`:''}
       ${sc.scrapDescription?`<div class="card-cell-body" style="font-size:11px;-webkit-line-clamp:2;">${esc(sc.scrapDescription)}</div>`:''}
       <div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;align-items:center;">
         <span class="source-badge" style="color:#4a7a52;background:#e4f0e4;border-color:#b8d4b8;">✂️${hl.length?` ${hl.length}件`:''}</span>
@@ -3286,12 +3584,26 @@ function renderScrapDetailSection(sc){
     </div>`:'' ;
 
   return`
-    <div class="scrap-url-bar">
-      <input class="scrap-url-in" id="scrapUrlIn" value="${esc(sc.scrapUrl||'')}" placeholder="https://…" onblur="saveScrapUrl('${sc.id}')">
-      <button class="scrap-fetch-btn" onclick="refetchScrap()">再取得</button>
-      ${sc.scrapUrl?`<a href="${esc(sc.scrapUrl)}" target="_blank" rel="noopener" style="font-size:13px;color:#3d6b45;flex-shrink:0;text-decoration:none;" title="元ページを開く">↗</a>`:''}
+    <div style="margin-bottom:10px;">
+      ${sc.scrapUrl
+        ?`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px;">
+            <a href="${esc(sc.scrapUrl)}" target="_blank" rel="noopener" style="font-size:12px;color:#3d6b45;text-decoration:underline;word-break:break-all;flex:1;">${esc(sc.scrapSiteName||sc.scrapUrl)}</a>
+            <button onclick="document.getElementById('scrapUrlEditBox_${sc.id}').style.display=document.getElementById('scrapUrlEditBox_${sc.id}').style.display==='none'?'block':'none'" style="padding:2px 9px;background:none;color:var(--text3);border:0.5px solid var(--border2);border-radius:20px;font-size:10px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;cursor:pointer;white-space:nowrap;flex-shrink:0;">URLを変更</button>
+          </div>
+          <div id="scrapUrlEditBox_${sc.id}" style="display:none;">
+            <input id="scrapUrlIn" value="${esc(sc.scrapUrl||'')}" placeholder="https://…" style="width:100%;padding:5px 9px;border:0.5px solid #b8d4b8;border-radius:var(--rsm);font-size:12px;font-family:inherit;outline:none;box-sizing:border-box;" onblur="saveScrapUrl('${sc.id}')">
+          </div>`
+        :`<input id="scrapUrlIn" value="" placeholder="URLを追加…" style="width:100%;padding:5px 9px;border:0.5px solid #b8d4b8;border-radius:var(--rsm);font-size:12px;font-family:inherit;outline:none;box-sizing:border-box;" onblur="saveScrapUrl('${sc.id}')">`
+      }
     </div>
-    ${imgGallery}
+    ${(()=>{
+      if(!sc.scrapImage)return '';
+      return `<div style="position:relative;margin-bottom:8px;">`
+        +`<img src="${esc(sc.scrapImage)}" style="width:100%;border-radius:var(--rsm);display:block;" loading="lazy" onerror="this.style.display='none'">`
+        +`<button onclick="deleteScrapImage('${sc.id}')" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:1;">✕</button>`
+        +`</div>`;
+    })()} 
+    <div class="scrap-meta-desc">${esc(sc.scrapDescription||'')}</div>
     <div class="scrap-meta-site">${esc(sc.scrapSiteName||'')}</div>
     <div style="margin-top:8px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
@@ -3337,15 +3649,20 @@ function removeScrapImage(scId,idx){
   openCardDetail(scId);
 }
 async function onScrapImageFile(e,scId){
-  const files=[...e.target.files];e.target.value='';if(!files.length)return;
-  const sc=outlines.find(x=>x.id===scId);if(!sc)return;
-  if(!sc.scrapImages)sc.scrapImages=[];
-  for(const file of files){
-    const dataUrl=await resizeImage(file,800,0.82);
-    sc.scrapImages.push(dataUrl);
-  }
+  const id=scId||currentCardOutlineId;
+  const file=e.target.files?.[0];e.target.value='';if(!file)return;
+  const sc=outlines.find(x=>x.id===id);if(!sc)return;
+  const dataUrl=await resizeImage(file,1200,0.85);
+  sc.scrapImage=dataUrl;
   sc.updatedAt=Date.now();save();
-  renderObjectGrid();openCardDetail(scId);
+  openCardDetail(id);
+}
+
+function deleteScrapImage(scId){
+  const sc=outlines.find(x=>x.id===scId);if(!sc)return;
+  sc.scrapImage='';sc.updatedAt=Date.now();save();
+  openCardDetail(scId);
+  renderScrapGrid11();
 }
 
 function refetchScrap(){
@@ -3434,9 +3751,11 @@ function renderMatSourceGrid(){
     const subs=ol.sourceSubItems||[];
     const quotes=ol.sourceQuotes||[];
     const domain=ol.sourceUrl?(()=>{try{return new URL(ol.sourceUrl).hostname.replace(/^www\./,'');}catch{return ol.sourceUrl.slice(0,30);}})():'';
+    const thumb=ol.sourceImage||(ol.images&&ol.images[0])||'';
     return`<div class="card-cell source-card" onclick="openCardDetail('${ol.id}')">
-      <div class="card-cell-title">${esc(ol.title||'無題')}</div>
-      ${domain?`<div class="source-url-chip">🔗 ${esc(domain)}</div>`:''}
+      <div class="card-cell-title" style="flex-shrink:0;">${esc(ol.title||'無題')}</div>
+      ${domain?`<div class="source-url-chip" style="flex-shrink:0;">🔗 ${esc(domain)}</div>`:''}
+      ${thumb?`<img src="${esc(thumb)}" style="width:100%;max-height:100px;object-fit:contain;flex-shrink:0;background:var(--bg3);border-radius:var(--rsm);" loading="lazy" onerror="this.style.display='none'">`:''}
       <div class="card-cell-body" style="flex:1;">${subs.slice(0,4).map(si=>`<div class="card-cell-line">• ${esc(si.label)}</div>`).join('')||`<div style="color:var(--text3);font-size:11px;">${esc(ol.sourceMemo?.slice(0,80)||'')}</div>`}</div>
       <div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;">
         ${subs.length?`<span class="source-badge">📋 ${subs.length}件</span>`:''}
@@ -3815,15 +4134,40 @@ function importBackup(){
     try{
       const data=JSON.parse(await file.text());
       if(!data.posts||!data.notes){alert('有効なバックアップファイルではありません');return;}
-      if(!confirm(`復元しますか？\n投稿：${data.posts.length}件　ノート：${data.notes.length}件\n※現在のデータは上書きされます`))return;
-      posts=data.posts||[];notes=data.notes||[];outlines=data.outlines||[];
-      notes.forEach(n=>{
-        if(!n.items)n.items=[];if(!n.stickies)n.stickies=[];
-        if(!n.paragraphs)n.paragraphs=n.body?n.body.split('\n').filter(l=>l.trim()):[];
-      });
+      if(!confirm(`復元しますか？\n投稿：${data.posts.length}件\n※現在のデータは上書きされます`))return;
+
+      posts=data.posts||[];
+      notes=data.notes||[];
+      outlines=data.outlines||[];
       posts.forEach(p=>{if(!p.replies)p.replies=[];});
-      save();renderSidebar();renderFeed();
-      alert('✓ 復元が完了しました');
+      notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
+
+      // 1. まずlocalStorageに書く
+      localStorage.setItem(KP,JSON.stringify(posts));
+      localStorage.setItem(KN,JSON.stringify(notes));
+      localStorage.setItem(KO,JSON.stringify(outlines));
+
+      // 2. 画面を更新
+      renderSidebar();renderFeed();
+
+      // 3. Supabaseに書く（直接upsert、saveTimerなし）
+      if(currentUser){
+        setSyncDot('syncing');
+        try{
+          await sb.from('thinkdata').upsert([
+            {user_id:currentUser.id,data_key:'posts',data_value:posts,updated_at:new Date().toISOString()},
+            {user_id:currentUser.id,data_key:'notes',data_value:notes,updated_at:new Date().toISOString()},
+            {user_id:currentUser.id,data_key:'outlines',data_value:outlines,updated_at:new Date().toISOString()},
+          ],{onConflict:'user_id,data_key'});
+          setSyncDot('saved');
+          alert(`✅ 復元完了！投稿${posts.length}件をSupabaseに保存しました。\n他のデバイスでは「🔍診断」→「⬇ Supabase→ローカル」を押してください。`);
+        }catch(err){
+          setSyncDot('');
+          alert('⚠️ ローカルには復元しましたが、Supabaseへの保存でエラーが出ました: '+err.message);
+        }
+      } else {
+        alert(`✅ ローカルに復元しました（投稿${posts.length}件）。`);
+      }
     }catch(err){alert('読み込みエラー: '+err.message);}
   };
   input.click();
@@ -3875,23 +4219,41 @@ let calCats=[
 
 // ─── Persist (local fallback) ─────────────────────────────
 function load(){loadLocal();}
-function save(){
-  localStorage.setItem(KP,JSON.stringify(posts));
-  localStorage.setItem(KN,JSON.stringify(notes));
-  localStorage.setItem(KO,JSON.stringify(outlines));
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(saveToSupabase,800); // 1.5s→0.8sに短縮
+// localStorage保存用に画像base64を除去（Supabaseにだけ保存）
+function stripImagesForLocal(posts){
+  return posts.map(p=>({
+    ...p,
+    images:(p.images||[]).filter(s=>!s.startsWith('data:')),
+    replies:(p.replies||[]).map(r=>({
+      ...r,
+      images:(r.images||[]).filter(s=>!s.startsWith('data:'))
+    }))
+  }));
 }
 
-// ページが非表示になるとき・閉じるときに即保存
+function save(){
+  try{
+    localStorage.setItem(KP,JSON.stringify(stripImagesForLocal(posts)));
+  }catch(e){
+    // 容量オーバー時は画像なしで保存
+    console.warn('localStorage posts save error:',e.message);
+  }
+  try{localStorage.setItem(KN,JSON.stringify(notes));}catch(e){}
+  try{localStorage.setItem(KO,JSON.stringify(outlines));}catch(e){}
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>sbRun(saveToSupabase),2000);
+}
+
+// ページが非表示になるとき・閉じるときに即保存（起動後5秒以降のみ）
+const _appStartTime=Date.now();
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='hidden'&&currentUser){
+  if(document.visibilityState==='hidden'&&currentUser&&(Date.now()-_appStartTime>5000)){
     clearTimeout(saveTimer);
-    saveToSupabase();
+    if(posts.length>0)saveToSupabase();
   }
 });
 window.addEventListener('beforeunload',()=>{
-  if(currentUser){clearTimeout(saveTimer);saveToSupabase();}
+  if(currentUser&&posts.length>0){clearTimeout(saveTimer);saveToSupabase();}
 });
 
 // ─── Helpers ─────────────────────────────────────────────
@@ -4457,6 +4819,19 @@ async function autoFetchSubItemUrl(url){
     if(ogp.title)labelIn.value=ogp.title;
   }catch(e){}
   finally{labelIn.placeholder=orig;}
+}
+
+function toggleSourceDetail(){
+  const body=document.getElementById('sourceDetailBody');
+  const icon=document.getElementById('sourceDetailToggleIcon');
+  if(!body)return;
+  const open=body.style.display==='none'||!body.style.display;
+  body.style.display=open?'block':'none';
+  if(icon)icon.textContent=open?'▾':'▸';
+  if(open){
+    // 開いたときにURLフィールドにフォーカス
+    document.getElementById('sourceUrlIn')?.focus();
+  }
 }
 
 function saveSourceMeta(){
@@ -5917,12 +6292,15 @@ function openNote(id){
     text=n.body;
   }
 
-  const ed=document.getElementById('noteTextEditor');
-  ed.textContent=text;
-  loadNoteEditorSettings(n);
-  renderStickyPane();
-  initLineNumberSync();
-  setTimeout(()=>ed.focus(),30);
+  const ta=document.getElementById('noteTextEditor');
+  if(ta)ta.value=text;
+  // 行幅設定を復元
+  const lwIn=document.getElementById('lineWidthIn');
+  if(lwIn){lwIn.value=n.lineWidth||0;}
+  setNoteViewMode(noteViewMode||'edit');
+  applyLineWidth();
+  updateEditorStats();
+  setTimeout(()=>ta?.focus(),30);
 }
 
 // ─── ノートエディタ設定 ───────────────────────────────────
@@ -5988,19 +6366,22 @@ function loadNoteEditorSettings(n){
 
 function onNoteTextInput(){
   const n=notes.find(x=>x.id===currentNoteId);if(!n)return;
-  const ed=document.getElementById('noteTextEditor');
-  n.mergedText=ed.textContent;
+  const ta=document.getElementById('noteTextEditor');
+  n.mergedText=ta?.value||'';
   n.updatedAt=Date.now();
-  updateLineNumbers();
+  updateEditorStats();
+  if(noteViewMode==='split')renderNotePreview();
   clearTimeout(onNoteTextInput._t);
   onNoteTextInput._t=setTimeout(()=>save(),800);
 }
 
 function onNoteTextKey(e){
-  // Tab → スペース2つ
   if(e.key==='Tab'){
     e.preventDefault();
-    document.execCommand('insertText',false,'  ');
+    const ta=e.target,s=ta.selectionStart,end=ta.selectionEnd;
+    ta.value=ta.value.slice(0,s)+'  '+ta.value.slice(end);
+    ta.selectionStart=ta.selectionEnd=s+2;
+    onNoteTextInput();
   }
 }
 function showEditorEmpty(){
@@ -6012,7 +6393,24 @@ function createBlankNote(){
   notes.push(n);currentNoteId=n.id;save();renderNotesList();openNote(n.id);
   setTimeout(()=>document.getElementById('editorTitle').select(),50);
 }
-function saveNoteTitle(){const n=notes.find(x=>x.id===currentNoteId);if(!n)return;n.title=document.getElementById('editorTitle').value;n.updatedAt=Date.now();save();renderNotesList();}
+function toggleUserMenu(){
+  const d=document.getElementById('userMenuDropdown');
+  if(!d)return;
+  const open=d.style.display==='none';
+  d.style.display=open?'block':'none';
+  if(open)setTimeout(()=>document.addEventListener('click',_closeMenuOnOutside,{once:true}),0);
+}
+function closeUserMenu(){
+  const d=document.getElementById('userMenuDropdown');
+  if(d)d.style.display='none';
+}
+function _closeMenuOnOutside(e){
+  const menu=document.getElementById('userMenuDropdown');
+  const btn=document.getElementById('userMenuBtn');
+  if(menu&&!menu.contains(e.target)&&e.target!==btn)closeUserMenu();
+}
+function saveNoteTitle(){
+const n=notes.find(x=>x.id===currentNoteId);if(!n)return;n.title=document.getElementById('editorTitle').value;n.updatedAt=Date.now();save();renderNotesList();}
 function deleteCurrentNote(){
   if(!currentNoteId||!confirm('削除しますか？'))return;
   notes=notes.filter(x=>x.id!==currentNoteId);currentNoteId=null;save();renderNotesList();showEditorEmpty();
@@ -6102,32 +6500,50 @@ function saveCardBlockSticky(bi,si,text){
 }
 
 
-function renderParaEditor(){
-  const n=notes.find(x=>x.id===currentNoteId);if(!n)return;
-  if(!n.paragraphs)n.paragraphs=[];
-  const editor=document.getElementById('paraEditor');
-  editor.innerHTML='';
-  const paras=n.paragraphs.length?n.paragraphs:[''];
-  paras.forEach((para,i)=>{
-    const row=document.createElement('div');row.className='para-row';row.dataset.idx=i;
-    const ta=document.createElement('textarea');
-    ta.className='para-input';ta.value=para;ta.rows=1;
-    ta.placeholder=i===0?'書き始める…':'';ta.dataset.idx=i;
-    setTimeout(()=>autoH(ta),0);
-    ta.addEventListener('input',()=>{autoH(ta);n.paragraphs[i]=ta.value;n.updatedAt=Date.now();save();updateEditorStats();});
-    ta.addEventListener('keydown',e=>onParaKey(e,i));
-    ta.addEventListener('focus',()=>highlightStickiesForPara(n.paragraphs[i]));
-    const addBtn=document.createElement('button');
-    addBtn.className='para-add-sticky';addBtn.textContent='＋ 付箋';
-    addBtn.onclick=()=>addStickyToParaIdx(i,ta.value);
-    row.appendChild(ta);row.appendChild(addBtn);
-    editor.appendChild(row);
-  });
-  const addPBtn=document.createElement('button');addPBtn.className='para-add-btn';addPBtn.textContent='＋ 段落を追加';addPBtn.onclick=()=>addPara();
-  editor.appendChild(addPBtn);
-  setTimeout(()=>{editor.querySelectorAll('.para-input').forEach(autoH);updateEditorStats();renderStickyPaneB();},30);
+function onNotePaste(e){
+  e.preventDefault();
+  // テキストのみ取り込む（書式・HTMLを除去）
+  const text=e.clipboardData?.getData('text/plain')||'';
+  const ta=e.target;
+  const s=ta.selectionStart,end=ta.selectionEnd;
+  ta.value=ta.value.slice(0,s)+text+ta.value.slice(end);
+  ta.selectionStart=ta.selectionEnd=s+text.length;
+  onNoteTextInput();
 }
 
+function setNoteViewMode(mode){
+  noteViewMode=mode;
+  const ed=document.getElementById('noteEditorOuter');
+  const pr=document.getElementById('notePreviewPane');
+  const ta=document.getElementById('noteTextEditor');
+  if(!ed||!pr)return;
+  ['edit','split','preview'].forEach(m=>{
+    const btn=document.getElementById('mdBtn'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(btn){btn.style.background=m===mode?'var(--accent)':'none';btn.style.color=m===mode?'#fff':'var(--text2)';btn.style.fontWeight=m===mode?'600':'400';}
+  });
+  if(mode==='edit'){
+    ed.style.display='flex';pr.style.display='none';
+    if(ta)ta.style.flex='1';
+  } else if(mode==='preview'){
+    ed.style.display='none';pr.style.display='block';
+    renderNotePreview();
+  } else {
+    ed.style.display='flex';pr.style.display='block';
+    if(ta)ta.style.flex='1';
+    renderNotePreview();
+  }
+}
+
+function renderNotePreview(){
+  const pr=document.getElementById('notePreviewPane');if(!pr)return;
+  const ta=document.getElementById('noteTextEditor');
+  const md=(ta?.value)||'';
+  if(typeof marked!=='undefined'){
+    pr.innerHTML=marked.parse(md,{breaks:true,gfm:true});
+  } else {
+    pr.innerHTML='<pre style="white-space:pre-wrap;">'+esc(md)+'</pre>';
+  }
+}
 function autoH(ta){ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';}
 
 function onParaKey(e,i){
@@ -6158,16 +6574,39 @@ function removePara(i){
 
 // ─── Stats ───────────────────────────────────────────────
 function updateEditorStats(){
-  const n=notes.find(x=>x.id===currentNoteId);if(!n)return;
-  const paras=(n.paragraphs||[]).filter(l=>l.trim());
-  const chars=paras.join('').replace(/\s/g,'').length;
-  const lineW=parseInt(document.getElementById('lineWidthIn')?.value||40)||40;
-  let lines=0;paras.forEach(p=>{lines+=Math.max(1,Math.ceil(p.replace(/\s/g,'').length/lineW));});
+  const ta=document.getElementById('noteTextEditor');
+  const text=ta?.value||'';
+  const chars=text.replace(/\s/g,'').length;
+  const lineW=parseInt(document.getElementById('lineWidthIn')?.value||0)||0;
+  let lineCount;
+  if(lineW>0){
+    // 各行の文字数を行幅で割って表示行数を積算
+    lineCount=text.split('\n').reduce((sum,line)=>{
+      const len=line.replace(/\s/g,'').length;
+      return sum+Math.max(1,Math.ceil(len/lineW));
+    },0);
+  } else {
+    lineCount=text.split('\n').length;
+  }
   document.getElementById('statChars').textContent=chars.toLocaleString();
-  document.getElementById('statParas').textContent=paras.length;
-  document.getElementById('statLines').textContent=lines;
+  document.getElementById('statLines').textContent=lineCount.toLocaleString();
 }
-document.addEventListener('DOMContentLoaded',()=>{document.getElementById('lineWidthIn')?.addEventListener('input',updateEditorStats);});
+
+function applyLineWidth(){
+  const ta=document.getElementById('noteTextEditor');
+  const w=parseInt(document.getElementById('lineWidthIn')?.value||0)||0;
+  if(w>0){
+    // em単位で幅を指定（1emが1文字）
+    ta.style.maxWidth=w+'em';
+    ta.style.boxSizing='content-box';
+  } else {
+    ta.style.maxWidth='';
+  }
+  // ノートに保存
+  const n=notes.find(x=>x.id===currentNoteId);
+  if(n){n.lineWidth=w;n.updatedAt=Date.now();save();}
+  updateEditorStats();
+}
 
 // ─── Sticky Pane B ───────────────────────────────────────
 function setupScrollSync(){

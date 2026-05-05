@@ -1089,8 +1089,20 @@ body {
 <div class="topbar">
   <div class="app-name">ThinkNotes</div>
   <!-- モバイル専用：⋯ メニュー -->
-  <div id="mobileTopBtns" style="display:none;align-items:center;gap:5px;margin-left:auto;">
+  <div id="mobileTopBtns" style="display:none;align-items:center;gap:5px;margin-left:auto;position:relative;">
     <button onclick="toggleUserMenu()" style="padding:4px 10px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:20px;font-size:13px;color:var(--text2);cursor:pointer;">⋯</button>
+    <!-- モバイル用ドロップダウン（デスクトップのと別インスタンス） -->
+    <div id="mobileUserMenuDropdown" style="display:none;position:fixed;top:50px;right:8px;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.15);min-width:180px;z-index:500;overflow:hidden;">
+      <button onclick="quickSyncUp();closeMobileMenu()" class="user-menu-item" style="color:#3d6b45;">⬆ このデバイスから送る</button>
+      <button onclick="quickSyncDown();closeMobileMenu()" class="user-menu-item" style="color:var(--source);">⬇ 受け取る</button>
+      <div style="border-top:0.5px solid var(--border);margin:2px 0;"></div>
+      <button onclick="exportBackup();closeMobileMenu()" class="user-menu-item">💾 バックアップ</button>
+      <button onclick="importBackup();closeMobileMenu()" class="user-menu-item">📂 バックアップから復元</button>
+      <button onclick="showDiag();closeMobileMenu()" class="user-menu-item">🔍 診断</button>
+      <button onclick="openBskySettings();closeMobileMenu()" class="user-menu-item">🦋 Bsky設定</button>
+      <div style="border-top:0.5px solid var(--border);margin:2px 0;"></div>
+      <button onclick="signOut()" class="user-menu-item" style="color:var(--red);">ログアウト</button>
+    </div>
   </div>
   <div class="phase-steps" id="mainNav">
     <div class="nav-group g-log">
@@ -1135,6 +1147,7 @@ body {
         <button onclick="quickSyncDown();closeUserMenu()" class="user-menu-item" style="color:var(--source);" id="syncDownBtn">⬇ 受け取る</button>
         <div style="border-top:0.5px solid var(--border);margin:2px 0;"></div>
         <button onclick="exportBackup();closeUserMenu()" class="user-menu-item">💾 バックアップ</button>
+        <button onclick="importBackup();closeUserMenu()" class="user-menu-item">📂 バックアップから復元</button>
         <button onclick="showDiag();closeUserMenu()" class="user-menu-item">🔍 診断</button>
         <button onclick="openBskySettings();closeUserMenu()" class="user-menu-item">🦋 Bsky設定</button>
         <div style="border-top:0.5px solid var(--border);margin:2px 0;"></div>
@@ -1328,9 +1341,15 @@ body {
         </div>
         <div class="cal-day-compose" id="calDayCompose" style="display:none;">
           <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;">
-            <textarea class="compose-ta" id="calComposeTA" placeholder="この日のつぶやきを追加…" onkeydown="onCalComposeKey(event)" style="min-height:52px;font-size:14px;"></textarea>
-            <div style="display:flex;justify-content:flex-end;padding:5px 10px;border-top:0.5px solid var(--border);">
-              <button class="compose-btn" onclick="submitCalPost()">投稿</button>
+            <textarea class="compose-ta" id="calComposeTA" placeholder="この日のつぶやきを追加…" onkeydown="onCalComposeKey(event)" onpaste="onNotePaste(event)" style="min-height:52px;font-size:14px;"></textarea>
+            <!-- 画像プレビュー -->
+            <div id="calImgPreview" style="display:flex;flex-wrap:wrap;gap:5px;padding:0 10px 5px;"></div>
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 10px;border-top:0.5px solid var(--border);">
+              <label style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text3);">時刻</label>
+              <input type="time" id="calPostTime" style="border:0.5px solid var(--border2);border-radius:var(--rsm);padding:3px 6px;font-size:12px;color:var(--text);background:var(--bg);outline:none;">
+              <button onclick="document.getElementById('calImgIn').click()" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--text3);" title="画像を追加">🖼️</button>
+              <input type="file" id="calImgIn" accept="image/*" multiple style="display:none" onchange="onCalImgSelect(event)">
+              <button class="compose-btn" style="margin-left:auto;" onclick="submitCalPost()">投稿</button>
             </div>
           </div>
         </div>
@@ -1438,8 +1457,24 @@ body {
   <!-- ═══ PHASE 8 — 写真 ═══ -->
   <div class="phase-screen" id="phase8">
     <div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">
-      <div style="padding:10px 1.5rem;border-bottom:0.5px solid var(--border);background:var(--bg3);flex-shrink:0;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text3);">投稿・返信・カードに添付した画像</div>
+      <div style="padding:8px 1.5rem;border-bottom:0.5px solid var(--border);background:var(--bg3);flex-shrink:0;display:flex;align-items:center;gap:10px;">
+        <span style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text3);">投稿・カードに添付した画像</span>
+        <div style="display:flex;gap:3px;margin-left:auto;background:var(--bg2);border:0.5px solid var(--border2);border-radius:20px;padding:2px;">
+          <button id="photoViewGrid" onclick="setPhotoView('grid')" style="padding:3px 10px;border:none;border-radius:20px;font-size:11px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;cursor:pointer;background:var(--accent);color:#fff;font-weight:600;">グリッド</button>
+          <button id="photoViewCal" onclick="setPhotoView('cal')" style="padding:3px 10px;border:none;border-radius:20px;font-size:11px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;cursor:pointer;background:none;color:var(--text2);">カレンダー</button>
+        </div>
+      </div>
+      <!-- グリッドビュー -->
       <div id="matPhotoGrid" style="display:flex;flex-wrap:wrap;gap:8px;padding:1rem 1.5rem;overflow-y:auto;flex:1;"></div>
+      <!-- カレンダービュー -->
+      <div id="photoCalView" style="display:none;flex-direction:column;height:100%;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 1.5rem;border-bottom:0.5px solid var(--border);flex-shrink:0;">
+          <button onclick="movePhotoCal(-1)" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text2);padding:0 4px;">‹</button>
+          <span id="photoCalTitle" style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:14px;font-weight:600;color:var(--text);flex:1;text-align:center;"></span>
+          <button onclick="movePhotoCal(1)" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text2);padding:0 4px;">›</button>
+        </div>
+        <div id="photoCalGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:8px;overflow-y:auto;flex:1;align-content:start;"></div>
+      </div>
     </div>
   </div>
 
@@ -1769,9 +1804,11 @@ async function signUpWithPassword(){
 async function signOut(){
   stopRealtime();
   clearTimeout(saveTimer);
-  try{await sb.auth.signOut();}catch(e){console.warn('signOut:',e);}
-  // セッショントークンを強制削除
-  Object.keys(localStorage).filter(k=>k.startsWith('sb-')).forEach(k=>localStorage.removeItem(k));
+  try{await sb.auth.signOut({scope:'local'});}catch(e){}
+  // supabase関連のキーを全消去
+  Object.keys(localStorage).filter(k=>
+    k.startsWith('sb-')||k.startsWith('supabase')
+  ).forEach(k=>localStorage.removeItem(k));
   sessionStorage.clear();
   location.reload();
 }
@@ -1779,40 +1816,68 @@ async function signOut(){
 async function loadFromSupabase(force=false){
   if(!currentUser)return;
 
-  // ローカルを読む（DEMOなし）
+  // ローカルを読む
   let localPosts=[], localNotes=[], localOutlines=[];
   try{localPosts=JSON.parse(localStorage.getItem(KP)||'[]');}catch(e){}
   try{localNotes=JSON.parse(localStorage.getItem(KN)||'[]');}catch(e){}
   try{localOutlines=JSON.parse(localStorage.getItem(KO)||'[]');}catch(e){}
 
+  // ローカルを即表示（data:URLも含めてそのまま使う）
   if(localPosts.length>0){
     posts=localPosts;notes=localNotes;outlines=localOutlines;
     posts.forEach(p=>{if(!p.replies)p.replies=[];});
-    setSyncDot('saved');
     renderSidebar();renderFeed();
-    return;
   }
 
-  // ローカルが空の場合のみSupabaseから取得
+  // 常にSupabaseを確認
   setSyncDot('syncing');
   try{
     const {data,error}=await sb.from('thinkdata')
       .select('data_key,data_value').eq('user_id',currentUser.id);
-    if(!error&&data){
-      const map={};data.forEach(r=>{map[r.data_key]=r.data_value;});
-      if(map.posts?.length){
-        posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
-        posts.forEach(p=>{if(!p.replies)p.replies=[];});
-        notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
-        localStorage.setItem(KP,JSON.stringify(posts));
-        localStorage.setItem(KN,JSON.stringify(notes));
-        localStorage.setItem(KO,JSON.stringify(outlines));
-      }
+    if(error)throw error;
+    const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
+    const sbPosts=map.posts||[];
+
+    if(!sbPosts.length){
+      // Supabaseが空→ローカルをアップロード
+      if(localPosts.length)sbRun(saveToSupabase);
+      setSyncDot('saved');return;
+    }
+
+    // 最新投稿のcreatedAtで比較
+    const latestLocal=localPosts.length
+      ?Math.max(...localPosts.map(p=>p.createdAt||0)):0;
+    const latestSb=Math.max(...sbPosts.map(p=>p.createdAt||0));
+
+    console.log(`📊 ローカル最新: ${new Date(latestLocal).toLocaleString()}`);
+    console.log(`📊 Supabase最新: ${new Date(latestSb).toLocaleString()}`);
+
+    if(latestSb>latestLocal){
+      // Supabaseが新しい→採用
+      console.log('✅ Supabaseを採用');
+      posts=sbPosts;notes=map.notes||[];outlines=map.outlines||[];
+      posts.forEach(p=>{if(!p.replies)p.replies=[];});
+      notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
+      const stripped=posts.map(p=>({...p,
+        images:(p.images||[]).filter(s=>!s.startsWith('data:')),
+        replies:(p.replies||[]).map(r=>({...r,images:(r.images||[]).filter(s=>!s.startsWith('data:'))}))
+      }));
+      localStorage.setItem(KP,JSON.stringify(stripped));
+      localStorage.setItem(KN,JSON.stringify(notes));
+      localStorage.setItem(KO,JSON.stringify(outlines));
+      renderSidebar();renderFeed();
+    } else if(latestLocal>latestSb){
+      // ローカルが新しい→Supabaseにアップロード
+      console.log('✅ ローカルを採用→アップロード');
+      sbRun(saveToSupabase);
+    } else {
+      console.log('✅ 同じ');
     }
   }catch(e){console.warn('load error:',e);}
   setSyncDot('saved');
-  renderSidebar();renderFeed();
 }
+
+
 
 
 async function _rawSave(p,n,o){
@@ -1840,10 +1905,21 @@ async function syncFromSupabase(){
       alert('Supabaseにデータがありません。別デバイスで「⬆ 送る」を押してください。');
       return;
     }
-    posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
+    // Supabaseのpostsは画像なし。既存KIの画像を使ってmerge
+    posts=mergeImages(map.posts||[]);notes=map.notes||[];outlines=map.outlines||[];
     posts.forEach(p=>{if(!p.replies)p.replies=[];});
     notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
-    localStorage.setItem(KP,JSON.stringify(posts));
+    // Supabaseに画像があれば退避、なければKIはそのまま保持
+    // post_imagesをローカルKIとマージ（新しい画像を消さない）
+    if(map.post_images&&Object.keys(map.post_images).length){
+      let _ki={};
+      try{_ki=JSON.parse(localStorage.getItem(KI)||'{}');}catch(e){}
+      // ローカルが優先（SupabaseにないローカルのURLを保持）
+      const _merged={...map.post_images,..._ki};
+      try{localStorage.setItem(KI,JSON.stringify(_merged));}catch(e){}
+    }
+    const _s1=posts.map(p=>({...p,images:(p.images||[]).filter(s=>!s.startsWith('data:')),replies:(p.replies||[]).map(r=>({...r,images:(r.images||[]).filter(s=>!s.startsWith('data:'))}))}));
+    localStorage.setItem(KP,JSON.stringify(_s1));
     localStorage.setItem(KN,JSON.stringify(notes));
     localStorage.setItem(KO,JSON.stringify(outlines));
     setSyncDot('saved');
@@ -2059,30 +2135,33 @@ let lastSaveOk=true; // 最後の保存が成功したか
 
 async function saveToSupabase(){
   if(!currentUser)return;
-  if(!posts.length&&!notes.length){
-    console.warn('saveToSupabase: データが空のためスキップ');
-    return;
-  }
+  if(!posts.length&&!notes.length){console.warn('saveToSupabase: 空データスキップ');return;}
   setSyncDot('syncing');
-  const uid=currentUser.id;
-  const ts=new Date().toISOString();
+  const uid=currentUser.id,ts=new Date().toISOString();
+  const stripped=posts.map(p=>({...p,
+    images:(p.images||[]).filter(s=>!s.startsWith('data:')),
+    replies:(p.replies||[]).map(r=>({...r,images:(r.images||[]).filter(s=>!s.startsWith('data:'))}))
+  }));
   const rows=[
-    {user_id:uid,data_key:'posts',   data_value:posts,   updated_at:ts},
+    {user_id:uid,data_key:'posts',   data_value:stripped,updated_at:ts},
     {user_id:uid,data_key:'notes',   data_value:notes,   updated_at:ts},
     {user_id:uid,data_key:'outlines',data_value:outlines,updated_at:ts},
   ];
   try{
-    const {error}=await sb.from('thinkdata')
-      .upsert(rows,{onConflict:'user_id,data_key'});
+    const {error}=await sb.from('thinkdata').upsert(rows,{onConflict:'user_id,data_key'});
     if(error)throw error;
-    lastSaveOk=true;
-    _lastSaveTime=Date.now();
+    lastSaveOk=true;_lastSaveTime=Date.now();
     setSyncDot('saved');
-    console.log('✅ Supabase保存完了 投稿'+posts.length+'件');
+    console.log('✅ 保存完了 投稿'+posts.length+'件');
   }catch(e){
     lastSaveOk=false;
     console.error('saveToSupabase error:',e.message);
     setSyncDot('error');
+    // エラー内容をdotのtitleに表示（ホバーで確認可能）
+    const _dot=document.getElementById('syncDot');
+    if(_dot)_dot.title='保存エラー: '+e.message;
+    // モバイル向けにalert
+    if(window.innerWidth<=640)setTimeout(()=>alert('⚠️ 保存エラー:\n'+e.message),500);
   }
 }
 
@@ -2193,10 +2272,18 @@ async function _pullFromSupabase(){
   if(error||!data)return;
   const map={};data.forEach(r=>{map[r.data_key]=r.data_value;});
   if(!map.posts?.length)return;
-  posts=map.posts;notes=map.notes||[];outlines=map.outlines||[];
+    // post_imagesをローカルKIとマージ
+    if(map.post_images&&Object.keys(map.post_images).length){
+      let _ki3={};
+      try{_ki3=JSON.parse(localStorage.getItem(KI)||'{}');}catch(e){}
+      const _m3={...map.post_images,..._ki3};
+      try{localStorage.setItem(KI,JSON.stringify(_m3));}catch(e){}
+    }
+  posts=mergeImages(map.posts||[]);notes=map.notes||[];outlines=map.outlines||[];
   posts.forEach(p=>{if(!p.replies)p.replies=[];});
   notes.forEach(n=>{if(!n.items)n.items=[];if(!n.paragraphs)n.paragraphs=[];});
-  localStorage.setItem(KP,JSON.stringify(posts));
+  const _stripped=posts.map(p=>({...p,images:(p.images||[]).filter(s=>!s.startsWith('data:')),replies:(p.replies||[]).map(r=>({...r,images:(r.images||[]).filter(s=>!s.startsWith('data:'))}))}));
+  localStorage.setItem(KP,JSON.stringify(_stripped));
   localStorage.setItem(KN,JSON.stringify(notes));
   localStorage.setItem(KO,JSON.stringify(outlines));
   setSyncDot('saved');
@@ -4219,9 +4306,31 @@ let calCats=[
 
 // ─── Persist (local fallback) ─────────────────────────────
 function load(){loadLocal();}
-// localStorage保存用に画像base64を除去（Supabaseにだけ保存）
-function stripImagesForLocal(posts){
-  return posts.map(p=>({
+// 画像データを別キーに退避・復元
+const KI='tn_post_images_v20';
+
+function extractAndSaveImages(postsArr){
+  // base64画像だけ別キーに保存（既存のKIとマージ）
+  let imgMap={};
+  try{imgMap=JSON.parse(localStorage.getItem(KI)||'{}');}catch(e){}
+  let updated=false;
+  postsArr.forEach(p=>{
+    const imgs=(p.images||[]).filter(s=>s.startsWith('data:'));
+    if(imgs.length){imgMap[p.id]=imgs;updated=true;}
+    (p.replies||[]).forEach(r=>{
+      const ri=(r.images||[]).filter(s=>s.startsWith('data:'));
+      if(ri.length){imgMap['r:'+r.id]=ri;updated=true;}
+    });
+  });
+  // 画像がなくてもKIに既存データがあれば保持（上書きしない）
+  if(Object.keys(imgMap).length){
+    try{localStorage.setItem(KI,JSON.stringify(imgMap));}catch(e){}
+  }
+}
+
+function mergeImages(postsArr){
+  // https://URLはそのまま保持（base64のみ除去）
+  return postsArr.map(p=>({
     ...p,
     images:(p.images||[]).filter(s=>!s.startsWith('data:')),
     replies:(p.replies||[]).map(r=>({
@@ -4232,11 +4341,11 @@ function stripImagesForLocal(posts){
 }
 
 function save(){
-  try{
-    localStorage.setItem(KP,JSON.stringify(stripImagesForLocal(posts)));
-  }catch(e){
-    // 容量オーバー時は画像なしで保存
-    console.warn('localStorage posts save error:',e.message);
+  // localStorageにはdata:URLも含めて全部保存（表示に必要）
+  try{localStorage.setItem(KP,JSON.stringify(posts));}catch(e){
+    // 容量オーバーならdata:だけ除去して再試行
+    const s2=posts.map(p=>({...p,images:(p.images||[]).filter(i=>!i.startsWith('data:')),replies:(p.replies||[]).map(r=>({...r,images:(r.images||[]).filter(i=>!i.startsWith('data:'))}))}));
+    try{localStorage.setItem(KP,JSON.stringify(s2));}catch(e2){console.warn('localStorage full:',e2.message);}
   }
   try{localStorage.setItem(KN,JSON.stringify(notes));}catch(e){}
   try{localStorage.setItem(KO,JSON.stringify(outlines));}catch(e){}
@@ -5187,22 +5296,75 @@ function renderCalPost(p){
   const tags=extractTags(p.content);
   const repliesHtml=(p.replies||[]).length?`<div style="padding-left:14px;border-left:2px solid var(--border2);margin-top:6px;">
     ${(p.replies||[]).map(r=>`<div style="padding:4px 0;">
-      <div style="font-size:13px;color:var(--text2);">${esc(r.content)}<span style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;color:var(--text3);margin-left:6px;">${fmtDt(r.createdAt)}</span></div>
-      ${(r.images&&r.images.length)?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${r.images.map(src=>`<img src="${src}" onclick="openLightbox('${src}')" loading="lazy" style="max-width:160px;max-height:120px;border-radius:var(--rsm);cursor:pointer;object-fit:cover;border:0.5px solid var(--border);">`).join('')}</div>`:''}
+      <div style="font-size:13px;color:var(--text2);">${esc(r.content)}</div>
+      ${(r.images&&r.images.length)?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">${r.images.map(src=>`<img src="${src}" onclick="openLightbox('${src}')" loading="lazy" style="max-width:160px;max-height:120px;border-radius:var(--rsm);cursor:pointer;object-fit:cover;">`).join('')}</div>`:''}
     </div>`).join('')}
   </div>`:'';
-  const imgsHtml=(p.images&&p.images.length)?`<div class="post-images" style="padding-left:0;margin-top:8px;">${p.images.map(src=>`<img class="post-image" src="${src}" onclick="openLightbox('${src}')" loading="lazy">`).join('')}</div>`:'';
+  const imgsHtml=(p.images&&p.images.length)?`<div class="post-images" style="padding-left:0;margin-top:8px;">
+    ${p.images.map((src,i)=>`<div style="position:relative;display:inline-block;margin:2px;">
+      <img class="post-image" src="${src}" onclick="openLightbox('${src}')" loading="lazy">
+      <button onclick="calRemoveImage('${p.id}',${i})" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;line-height:1;">✕</button>
+    </div>`).join('')}
+  </div>`:'';
   return`<div class="post" id="calpost-${p.id}" style="padding:10px 0;">
     <div class="post-text" style="font-size:14px;">${linkify(text)||'（空）'}</div>
-    <div class="post-meta" style="margin-top:4px;">
+    <div class="post-meta" style="margin-top:6px;display:flex;align-items:center;flex-wrap:wrap;gap:5px;">
       <span class="post-time">${fmtDt(p.createdAt)}</span>
-      ${tags.map(t=>`<span style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;color:var(--accent);margin-left:4px;">#${esc(t)}</span>`).join('')}
-      ${p.bskyUri?`<span class="bsky-post-status ok" style="font-size:9px;padding:1px 5px;margin-left:4px;">🦋</span>`:''}
+      ${tags.map(t=>`<span style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;color:var(--accent);cursor:pointer;" onclick="calRemoveTag('${p.id}','${t}')">#${esc(t)} ✕</span>`).join('')}
+      ${p.bskyUri?`<span class="bsky-post-status ok" style="font-size:9px;">🦋</span>`:''}
+      <span onclick="calTagInput('${p.id}')" style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;color:var(--text3);cursor:pointer;padding:1px 7px;border:0.5px dashed var(--border2);border-radius:20px;">＋タグ</span>
+      <label style="cursor:pointer;font-size:12px;color:var(--text3);" title="写真を追加">🖼️<input type="file" accept="image/*" multiple style="display:none" onchange="calAddImages(event,'${p.id}')"></label>
+    </div>
+    <div id="calTagIn-${p.id}" style="display:none;margin-top:4px;">
+      <input placeholder="#タグ名" style="padding:3px 8px;border:0.5px solid var(--border2);border-radius:20px;font-size:12px;font-family:inherit;outline:none;width:130px;"
+        onkeydown="if(event.key==='Enter'&&!event.isComposing){calAddTag('${p.id}',this.value);this.value='';}">
     </div>
     ${imgsHtml}
     ${repliesHtml}
   </div>`;
 }
+function calTagInput(postId){
+  const d=document.getElementById('calTagIn-'+postId);
+  if(!d)return;
+  const open=d.style.display==='none';
+  d.style.display=open?'block':'none';
+  if(open)d.querySelector('input')?.focus();
+}
+function calAddTag(postId,val){
+  const tag=(val||'').replace(/^#+/,'').trim();
+  if(!tag)return;
+  const p=posts.find(x=>x.id===postId);if(!p)return;
+  if(!p.content.includes('#'+tag))p.content+=' #'+tag;
+  p.updatedAt=Date.now();save();
+  renderCalDayView(calSelectedDate);
+}
+function calRemoveTag(postId,tag){
+  const p=posts.find(x=>x.id===postId);if(!p)return;
+  p.content=p.content.replace(new RegExp('\\s*#'+tag+'\\b','g'),'').trim();
+  p.updatedAt=Date.now();save();
+  renderCalDayView(calSelectedDate);
+}
+function calRemoveImage(postId,idx){
+  const p=posts.find(x=>x.id===postId);if(!p)return;
+  p.images=(p.images||[]);p.images.splice(idx,1);
+  p.updatedAt=Date.now();save();
+  renderCalDayView(calSelectedDate);
+}
+async function calAddImages(e,postId){
+  const files=Array.from(e.target.files||[]);e.target.value='';
+  const p=posts.find(x=>x.id===postId);if(!p)return;
+  if(!p.images)p.images=[];
+  const pending=[];
+  for(const f of files){
+    const dataUrl=await resizeImage(f,1200,0.85);
+    pending.push({dataUrl});
+  }
+  const urls=await uploadImagesToStorage(pending);
+  p.images.push(...urls);
+  p.updatedAt=Date.now();save();
+  renderCalDayView(calSelectedDate);
+}
+
 function calPrevMonth(){
   calMonth--;if(calMonth<0){calMonth=11;calYear--;}
   renderCalendar();
@@ -5232,19 +5394,53 @@ function onCalComposeKey(e){
   if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();submitCalPost();}
   setTimeout(()=>{const t=e.target;t.style.height='auto';t.style.height=Math.min(160,t.scrollHeight)+'px';},0);
 }
-function submitCalPost(){
+let _calImgs=[];
+
+async function onCalImgSelect(e){
+  const files=Array.from(e.target.files||[]);
+  e.target.value='';
+  for(const f of files){
+    const dataUrl=await resizeImage(f,1200,0.85);
+    _calImgs.push(dataUrl);
+  }
+  renderCalImgPreview();
+}
+
+function renderCalImgPreview(){
+  const el=document.getElementById('calImgPreview');
+  if(!el)return;
+  el.innerHTML=_calImgs.map((src,i)=>`
+    <div style="position:relative;display:inline-block;">
+      <img src="${esc(src)}" style="height:48px;width:48px;object-fit:cover;border-radius:var(--rsm);">
+      <button onclick="_calImgs.splice(${i},1);renderCalImgPreview()" style="position:absolute;top:-4px;right:-4px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:9px;cursor:pointer;line-height:1;">✕</button>
+    </div>`).join('');
+}
+
+async function submitCalPost(){
   const ta=document.getElementById('calComposeTA');if(!ta)return;
-  const text=ta.value.trim();if(!text||!calSelectedDate)return;
-  // 指定日の23:59:59に投稿（タイムライン上では過去に並ぶ）
-  const endOfDay=new Date(calSelectedDate+'T23:59:59').getTime();
-  // 同日に複数あれば最後+1ms（日をまたがないよう同日内に収める）
-  const dayPosts=postsForDate(calSelectedDate);
-  const ts=dayPosts.length>0
-    ?Math.min(endOfDay, Math.max(...dayPosts.map(p=>p.createdAt))+1)
-    :endOfDay;
-  const p={id:uid(),content:text,createdAt:ts,updatedAt:ts,starred:false,replies:[]};
+  const text=ta.value.trim();if(!text&&!_calImgs.length)return;
+  if(!calSelectedDate)return;
+  const timeVal=document.getElementById('calPostTime')?.value;
+  let ts;
+  if(timeVal){
+    ts=new Date(calSelectedDate+'T'+timeVal+':00').getTime();
+  } else {
+    const endOfDay=new Date(calSelectedDate+'T23:59:59').getTime();
+    const dayPosts=postsForDate(calSelectedDate);
+    ts=dayPosts.length>0
+      ?Math.min(endOfDay, Math.max(...dayPosts.map(p=>p.createdAt))+1)
+      :endOfDay;
+  }
+  // 画像をStorageにアップロード
+  const localImgs=_calImgs.map(src=>({dataUrl:src}));
+  const imgUrls=localImgs.length>0
+    ?await uploadImagesToStorage(localImgs)
+    :[];
+  const p={id:uid(),content:text,createdAt:ts,updatedAt:ts,starred:false,replies:[],images:imgUrls};
   posts.push(p);
   ta.value='';ta.style.height='';
+  _calImgs=[];renderCalImgPreview();
+  const ti=document.getElementById('calPostTime');if(ti)ti.value='';
   save();renderFeed();renderSidebar();
   renderCalendar();renderCalDayView(calSelectedDate);
 }
@@ -6394,20 +6590,98 @@ function createBlankNote(){
   setTimeout(()=>document.getElementById('editorTitle').select(),50);
 }
 function toggleUserMenu(){
-  const d=document.getElementById('userMenuDropdown');
-  if(!d)return;
-  const open=d.style.display==='none';
-  d.style.display=open?'block':'none';
-  if(open)setTimeout(()=>document.addEventListener('click',_closeMenuOnOutside,{once:true}),0);
+  const isMobile=window.innerWidth<=640;
+  if(isMobile){
+    const d=document.getElementById('mobileUserMenuDropdown');
+    if(!d)return;
+    const open=d.style.display==='none'||!d.style.display;
+    d.style.display=open?'block':'none';
+    if(open)setTimeout(()=>document.addEventListener('click',_closeMobileMenuOnOutside,{once:true}),0);
+  } else {
+    const d=document.getElementById('userMenuDropdown');
+    if(!d)return;
+    const open=d.style.display==='none'||!d.style.display;
+    d.style.display=open?'block':'none';
+    if(open)setTimeout(()=>document.addEventListener('click',_closeMenuOnOutside,{once:true}),0);
+  }
 }
 function closeUserMenu(){
-  const d=document.getElementById('userMenuDropdown');
-  if(d)d.style.display='none';
+  document.getElementById('userMenuDropdown')?.style && (document.getElementById('userMenuDropdown').style.display='none');
+}
+function closeMobileMenu(){
+  document.getElementById('mobileUserMenuDropdown')?.style && (document.getElementById('mobileUserMenuDropdown').style.display='none');
 }
 function _closeMenuOnOutside(e){
   const menu=document.getElementById('userMenuDropdown');
   const btn=document.getElementById('userMenuBtn');
   if(menu&&!menu.contains(e.target)&&e.target!==btn)closeUserMenu();
+}
+function _closeMobileMenuOnOutside(e){
+  const menu=document.getElementById('mobileUserMenuDropdown');
+  if(menu&&!menu.contains(e.target))closeMobileMenu();
+}
+// ── 写真タブ ビュー切り替え ─────────────────────────────────
+let _photoView='grid';
+let _photoCalYear=new Date().getFullYear();
+let _photoCalMonth=new Date().getMonth(); // 0-indexed
+
+function setPhotoView(mode){
+  _photoView=mode;
+  document.getElementById('matPhotoGrid').style.display=mode==='grid'?'flex':'none';
+  document.getElementById('photoCalView').style.display=mode==='cal'?'flex':'none';
+  const gBtn=document.getElementById('photoViewGrid');
+  const cBtn=document.getElementById('photoViewCal');
+  if(gBtn){gBtn.style.background=mode==='grid'?'var(--accent)':'none';gBtn.style.color=mode==='grid'?'#fff':'var(--text2)';gBtn.style.fontWeight=mode==='grid'?'600':'400';}
+  if(cBtn){cBtn.style.background=mode==='cal'?'var(--accent)':'none';cBtn.style.color=mode==='cal'?'#fff':'var(--text2)';cBtn.style.fontWeight=mode==='cal'?'600':'400';}
+  if(mode==='cal')renderPhotoCal();
+}
+
+function movePhotoCal(dir){
+  _photoCalMonth+=dir;
+  if(_photoCalMonth>11){_photoCalMonth=0;_photoCalYear++;}
+  if(_photoCalMonth<0){_photoCalMonth=11;_photoCalYear--;}
+  renderPhotoCal();
+}
+
+function renderPhotoCal(){
+  const title=document.getElementById('photoCalTitle');
+  const grid=document.getElementById('photoCalGrid');
+  if(!title||!grid)return;
+  title.textContent=`${_photoCalYear}年${_photoCalMonth+1}月`;
+
+  // この月の投稿から日付→最初の画像マップを作成
+  const imgByDate={};
+  posts.forEach(p=>{
+    const d=new Date(p.createdAt);
+    if(d.getFullYear()!==_photoCalYear||d.getMonth()!==_photoCalMonth)return;
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if(!imgByDate[key]){
+      // 最初の画像を探す
+      const imgs=[...(p.images||[]),...(p.replies||[]).flatMap(r=>r.images||[])];
+      if(imgs.length)imgByDate[key]=imgs[0];
+    }
+  });
+
+  // 曜日ヘッダー
+  const days=['日','月','火','水','木','金','土'];
+  const first=new Date(_photoCalYear,_photoCalMonth,1).getDay();
+  const last=new Date(_photoCalYear,_photoCalMonth+1,0).getDate();
+
+  let html=days.map(d=>`<div style="text-align:center;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;color:var(--text3);padding:4px 0;">${d}</div>`).join('');
+  // 空白
+  for(let i=0;i<first;i++) html+=`<div></div>`;
+  // 日付セル
+  for(let d=1;d<=last;d++){
+    const key=`${_photoCalYear}-${String(_photoCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const img=imgByDate[key];
+    const today=new Date();
+    const isToday=today.getFullYear()===_photoCalYear&&today.getMonth()===_photoCalMonth&&today.getDate()===d;
+    html+=`<div onclick="switchPhase(2);selectCalDate('${key}')" style="position:relative;aspect-ratio:1;border-radius:4px;overflow:hidden;cursor:pointer;background:${img?'transparent':'var(--bg3)'};border:${isToday?'2px solid var(--accent)':'0.5px solid var(--border)'};margin:1px;">
+      ${img?`<img src="${esc(img)}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">`:``}
+      <div style="position:absolute;bottom:2px;left:0;right:0;text-align:center;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:9px;font-weight:600;color:${img?'#fff':'var(--text3)'};text-shadow:${img?'0 1px 2px rgba(0,0,0,.7)':'none'};">${d}</div>
+    </div>`;
+  }
+  grid.innerHTML=html;
 }
 function saveNoteTitle(){
 const n=notes.find(x=>x.id===currentNoteId);if(!n)return;n.title=document.getElementById('editorTitle').value;n.updatedAt=Date.now();save();renderNotesList();}

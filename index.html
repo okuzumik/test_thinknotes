@@ -174,14 +174,14 @@ body {
 .post-images { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; padding-left:27px; }
 .post-image { max-width:280px; max-height:220px; border-radius:var(--rsm); cursor:pointer; border:0.5px solid var(--border); object-fit:cover; }
 /* OGP カード */
-.ogp-card { display:flex; gap:0; margin-top:6px; border:0.5px solid var(--border); border-radius:var(--rsm); overflow:hidden; cursor:pointer; background:var(--bg2); max-width:300px; transition:background .15s; }
+.ogp-card { display:flex; gap:0; margin-top:6px; border:0.5px solid var(--border); border-radius:var(--rsm); overflow:hidden; cursor:pointer; background:var(--bg2); max-width:480px; width:100%; transition:background .15s; }
 .ogp-card:hover { background:var(--bg3); }
-.ogp-card-img { width:56px; flex-shrink:0; }
+.ogp-card-img { width:68px; flex-shrink:0; }
 .ogp-card-img img { width:100%; height:100%; object-fit:cover; display:block; min-height:44px; }
 .ogp-card-img.no-img { display:none; }
 .ogp-card-body { padding:5px 8px; flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; justify-content:center; }
 .ogp-card-site { font-size:9px; color:var(--text3); font-family:'Hiragino Kaku Gothic ProN',sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.ogp-card-title { font-size:11px; font-weight:600; color:var(--text); font-family:'Hiragino Kaku Gothic ProN',sans-serif; line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.ogp-card-title { font-size:12px; font-weight:500; color:var(--text3); font-family:'Hiragino Kaku Gothic ProN',sans-serif; line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .ogp-card-desc { display:none; }
 /* コンポーズのOGPプレビュー */
 .compose-ogp-wrap { padding:0 10px 8px; }
@@ -925,6 +925,9 @@ body {
 .source-quote-card { background:#fff; border:0.5px solid var(--source-m); border-left:3px solid var(--source); border-radius:var(--rsm); overflow:hidden; }
 .source-quote-card:hover .source-quote-actions { opacity:1; }
 .source-quote-body { padding:9px 12px; }
+.quote-body { background:#e8e4db; border-left:3px solid var(--border2); border-radius:0 var(--rsm) var(--rsm) 0; padding:8px 10px; margin-bottom:4px; }
+.quote-body::before { content:'❝'; font-size:10px; color:var(--text3); display:block; margin-bottom:2px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; }
+.post.is-quote .post-text { font-style:italic; color:var(--text2); }
 .source-quote-episode { display:inline-block; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:9px; color:var(--source); background:var(--source-l); border:0.5px solid var(--source-m); border-radius:20px; padding:1px 7px; margin-bottom:5px; }
 .source-quote-text { font-size:12.5px; line-height:1.75; color:var(--text2); font-style:italic; white-space:pre-wrap; word-break:break-word; border-left:2px solid var(--source-m); padding-left:8px; margin:0 0 6px; }
 .source-quote-comment { font-size:12.5px; line-height:1.7; color:var(--text); white-space:pre-wrap; word-break:break-word; }
@@ -1203,6 +1206,7 @@ body {
             <button class="img-attach-btn" onclick="openSourcePicker()" title="ソースを引用" style="font-size:13px;">📎</button>
             <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="onImageSelected(event)">
             <div class="compose-hint">Ctrl+Enter で投稿　<span>#タグ</span> は後から追加・削除できます</div>
+            <button onclick="toggleQuoteTag()" id="quoteTagBtn" title="#引用タグを付けて引用スタイルで投稿" style="padding:3px 10px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-size:11px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;color:var(--text3);cursor:pointer;">❝ 引用</button>
             <label class="bsky-check-wrap" id="bskyCheckWrap" style="display:none">
               <input type="checkbox" id="bskyCheck">🦋 Bskyにも
             </label>
@@ -2401,7 +2405,7 @@ function bskyAppendSourceTag(text, sourceTitle){
   return combined.length<=300?combined:text.slice(0,300-tag.length-1).trimEnd()+'\n'+tag;
 }
 
-async function postToBsky(text, replyRef=null, imageUrls=[]){
+async function postToBsky(text, replyRef=null, imageUrls=[], originalFiles=[]){
   if(!bskySession)return{ok:false,error:'未接続'};
   const bskyText=text.length>300?text.slice(0,297)+'…':text;
   // ハッシュタグfacet
@@ -2424,10 +2428,18 @@ async function postToBsky(text, replyRef=null, imageUrls=[]){
   // 画像をBskyにアップロードしてembedに追加
   if(imageUrls&&imageUrls.length>0){
     const blobs=[];
-    for(const url of imageUrls.slice(0,4)){ // Bskyは最大4枚
+    for(let i=0;i<Math.min(imageUrls.length,4);i++){
+      const url=imageUrls[i];
+      const origFile=originalFiles[i]||null;
       try{
-        const imgRes=await fetch(url);
-        const blob=await imgRes.blob();
+        let blob;
+        if(origFile){
+          // オリジナル画質をそのまま使用
+          blob=origFile;
+        } else {
+          const imgRes=await fetch(url);
+          blob=await imgRes.blob();
+        }
         const uploadRes=await fetch('https://bsky.social/xrpc/com.atproto.repo.uploadBlob',{
           method:'POST',
           headers:{'Content-Type':blob.type,'Authorization':'Bearer '+bskySession.accessJwt},
@@ -2435,7 +2447,9 @@ async function postToBsky(text, replyRef=null, imageUrls=[]){
         });
         if(uploadRes.ok){
           const d=await uploadRes.json();
-          blobs.push({image:d.blob,alt:''});
+          // アスペクト比を取得して空白を防ぐ
+          const imgEl=await new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.src=origFile?URL.createObjectURL(origFile):url;});
+          blobs.push({image:d.blob,alt:'',aspectRatio:{width:imgEl.naturalWidth||1,height:imgEl.naturalHeight||1}});
         }
       }catch(e){console.warn('blob upload error:',e);}
     }
@@ -4957,8 +4971,8 @@ async function onImageSelected(e){
   const files=[...e.target.files];
   e.target.value='';
   for(const file of files){
-    const dataUrl=await resizeImage(file,800,0.72);
-    pendingImages.push({dataUrl});
+    const dataUrl=await resizeImage(file,1200,0.82);
+    pendingImages.push({dataUrl, originalFile:file}); // 元ファイルをBsky用に保持
   }
   renderImgPreview();
   // 入力欄を展開
@@ -5505,8 +5519,21 @@ function renderFeed(){
 function linkify(text){
   // URLをリンクに変換（XSS対策でescした後に処理）
   return esc(text).replace(
-    /https?:\/\/[^\s<>"'）】』」\u3002\uff0e]+/g,
-    url=>`<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:var(--teal);text-decoration:underline;word-break:break-all;font-size:.85em;">${url}</a>`
+    /https?:\/\/[^\s<>"'）】』」。]+/g,
+    url=>{
+      // 末尾の句読点・カッコ等を除去
+      url=url.replace(/[。、）】』」.,!?:;]+$/,'');
+      // 表示用：ドメイン＋パスを短縮（40字超えたら末尾を…）
+      let label=url;
+      try{
+        const u=new URL(url);
+        const path=decodeURIComponent(u.pathname).replace(/\/$/,'');
+        const tail=path.split('/').pop()||'';
+        label=u.hostname+(tail?'/'+tail:'');
+      }catch(e){}
+      if(label.length>45)label=label.slice(0,44)+'…';
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" title="${url}" style="display:none;"></a>`;
+    }
   );
 }
 
@@ -5578,11 +5605,14 @@ function renderPost(p){
       </div>
     </div>`:'';
 
+  const isQuote=tags.includes('引用');
   return`<div class="post ${sel?'selected':''}" id="post-${p.id}">
     <div class="post-row1">
       <div class="post-sel"><div class="post-sel-box ${sel?'checked':''}" onclick="toggleSel('${p.id}')"></div></div>
       <div class="post-body">
-        ${isEditing?'':`<div class="post-text">${linkify(displayText)||'（空）'}</div>`}
+        ${isEditing?'':`${isQuote?'<div class="quote-body">':''}<div class="post-text">${linkify(displayText)||'（空）'}</div>${isQuote?'</div>':''}`}
+        ${p.ogp?`<div style="margin-top:6px;">`+renderOgpCard(p.ogp)+`</div>`:''}
+        ${p.sourceRef?`<div style="margin-top:6px;">`+renderPostSourceCard(p.sourceRef)+`</div>`:''}
         <div class="post-meta">
           <span class="post-time">${fmtDt(p.createdAt)}</span>
           ${p.bskyUri?`<span class="bsky-post-status ok" style="font-size:9px;padding:1px 5px;">🦋</span>`:''}
@@ -5612,15 +5642,14 @@ function renderPost(p){
         <button class="post-edit-btn save" onclick="savePostEdit('${p.id}')">保存</button>
         <button class="post-edit-btn cancel" onclick="cancelPostEdit()">キャンセル</button>
       </div></div>`:''}
+    ${p.quoteText?`<div style="margin-top:8px;margin-left:1rem;padding:7px 12px 7px 12px;border-left:3px solid var(--source);background:var(--source-l);border-radius:0 var(--rsm) var(--rsm) 0;"><div style="font-size:9px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;color:var(--source);font-weight:600;margin-bottom:4px;letter-spacing:.05em;">引用</div><div style="font-size:12.5px;color:var(--text2);font-style:italic;line-height:1.7;white-space:pre-wrap;word-break:break-word;">${esc(p.quoteText)}</div></div>`:''}
+    ${(p.images&&p.images.length)?`<div class="post-images">${p.images.map(src=>`<img class="post-image" src="${src}" onclick="openLightbox('${src}')" loading="lazy">`).join('')}</div>`:''}
     <div class="post-tags-row">
       ${tagPills}
       ${isEditingTag
         ?`<span class="tag-input-wrap"><input class="tag-input" id="taginput-${p.id}" placeholder="タグ名" maxlength="20" onkeydown="onTagInputKey(event,'${p.id}')" onblur="cancelTagEdit('${p.id}')"></span>`
         :`<button class="tag-add-btn" onclick="startTagEdit('${p.id}')">＋ タグ</button>`}
     </div>
-    ${p.quoteText?`<div style="margin-top:8px;margin-left:1rem;padding:7px 12px 7px 12px;border-left:3px solid var(--source);background:var(--source-l);border-radius:0 var(--rsm) var(--rsm) 0;"><div style="font-size:9px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;color:var(--source);font-weight:600;margin-bottom:4px;letter-spacing:.05em;">引用</div><div style="font-size:12.5px;color:var(--text2);font-style:italic;line-height:1.7;white-space:pre-wrap;word-break:break-word;">${esc(p.quoteText)}</div></div>`:''}\n    ${(p.images&&p.images.length)?`<div class="post-images">${p.images.map(src=>`<img class="post-image" src="${src}" onclick="openLightbox('${src}')" loading="lazy">`).join('')}</div>`:''}
-    ${p.ogp?renderOgpCard(p.ogp):''}
-    ${p.sourceRef?renderPostSourceCard(p.sourceRef):''}
     ${threadHtml}
     ${replyComposeHtml}
   </div>`;
@@ -5650,15 +5679,43 @@ async function uploadImagesToStorage(pendingImgs){
 }
 
 // Post CRUD
+function toggleQuoteTag(){
+  const ta=document.getElementById('composeTA');
+  const btn=document.getElementById('quoteTagBtn');
+  if(!ta||!btn)return;
+  const hasTag=ta.value.includes('#引用');
+  if(hasTag){
+    ta.value=ta.value.replace(/\s*#引用/g,'').trim();
+    btn.style.background='none';btn.style.color='var(--text3)';btn.style.borderColor='var(--border2)';
+  } else {
+    ta.value=(ta.value.trim()+' #引用').trim();
+    btn.style.background='var(--accent-l)';btn.style.color='var(--accent-d)';btn.style.borderColor='var(--accent-m,#c8a860)';
+  }
+  ta.focus();
+}
+
 async function submitPost(){
   const ta=document.getElementById('composeTA');const text=ta.value.trim();
   if(!text&&!pendingImages.length&&!pendingOgp)return;
   const bskyCheck=document.getElementById('bskyCheck');
   const postToBskyFlag=!!(bskyCheck?.checked&&bskySession);
   const localImgs=[...pendingImages];
-  const ogpData=pendingOgp?{...pendingOgp}:null;
+  let ogpData=pendingOgp?{...pendingOgp}:null;
   const sourceRefData=pendingSourceRef?{...pendingSourceRef}:null;
   const quoteData=pendingQuoteText?pendingQuoteText:null;
+  const isQuote=extractTags(text).includes('引用');
+
+  // #引用 + URLがあればOGPを自動取得
+  if(isQuote&&!ogpData&&!sourceRefData){
+    const urlMatch=text.match(/https?:\/\/[^\s<>"'）】』」。]+/);
+    if(urlMatch){
+      try{
+        const fetched=await fetchOgpData(urlMatch[0]);
+        if(fetched?.title)ogpData=fetched;
+      }catch(e){}
+    }
+  }
+
   const p={id:uid(),content:text,createdAt:Date.now(),updatedAt:Date.now(),starred:false,replies:[],
     images:localImgs.map(i=>i.dataUrl),
     ...(ogpData?{ogp:ogpData}:{}),
@@ -5667,20 +5724,33 @@ async function submitPost(){
   posts.push(p);
   ta.value='';ta.style.height='';
   pendingImages=[];renderImgPreview();
-  dismissOgp();
-  dismissSourceRef();
-  dismissQuoteText();
+  dismissOgp();dismissSourceRef();dismissQuoteText();
   ta.classList.remove('mobile-expanded');ta.classList.add('mobile-collapsed');
+
+  // #引用 + メディア選択 → sourceQuotesにも追記
+  if(isQuote&&sourceRefData?.outlineId){
+    const ol=outlines.find(x=>x.id===sourceRefData.outlineId);
+    if(ol){
+      if(!ol.sourceQuotes)ol.sourceQuotes=[];
+      ol.sourceQuotes.push({
+        id:uid(),
+        quoteText:text.replace(/#引用\b/g,'').trim(),
+        comment:'',
+        subItemId:sourceRefData.subItemId||null,
+        postId:p.id,
+        createdAt:Date.now()
+      });
+    }
+  }
+
   save();renderFeed();renderSidebar();
-  // バックグラウンドでStorageにアップロードしてURLに差し替え
   if(localImgs.length&&currentUser){
     const urls=await uploadImagesToStorage(localImgs);
-    p.images=urls;
-    save();
+    p.images=urls;save();
   }
   if(postToBskyFlag){
     const bskyText=sourceRefData?bskyAppendSourceTag(text,sourceRefData.title):text;
-    const result=await postToBsky(bskyText,null,p.images||[]);
+    const result=await postToBsky(bskyText,null,p.images||[],localImgs.map(i=>i.originalFile).filter(Boolean));
     if(result.ok){p.bskyUri=result.uri;p.bskyCid=result.cid;save();showBskyPostStatus(p.id,true);}
     else showBskyPostStatus(p.id,false,null,result.error);
   }
@@ -5730,7 +5800,7 @@ async function onReplyImageSelected(e,pid){
   const files=[...e.target.files];e.target.value='';
   if(!pendingReplyImages[pid])pendingReplyImages[pid]=[];
   for(const file of files){
-    const dataUrl=await resizeImage(file,800,0.72);
+    const dataUrl=await resizeImage(file,1200,0.82);
     pendingReplyImages[pid].push({dataUrl});
   }
   renderReplyImgPreview(pid);

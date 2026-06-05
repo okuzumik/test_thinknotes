@@ -853,7 +853,7 @@ body {
 .card-grid-count { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:11px; color:var(--text3); }
 .card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:10px; padding:1rem 1.5rem 3rem; overflow-y:auto; align-content:start; flex:1; }
 .card-grid-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text3); font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:13px; text-align:center; line-height:1.8; }
-.card-cell { background:var(--bg2); border:0.5px solid var(--border); border-left:2px solid var(--border2); border-radius:var(--rsm); padding:11px; cursor:pointer; transition:border-color .12s,box-shadow .12s; display:flex; flex-direction:column; gap:5px; height:190px; overflow:hidden; position:relative; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+.card-cell { position:relative; background:var(--bg2); border:0.5px solid var(--border); border-left:2px solid var(--border2); border-radius:var(--rsm); padding:11px; cursor:pointer; transition:border-color .12s,box-shadow .12s; display:flex; flex-direction:column; gap:5px; height:190px; overflow:hidden; position:relative; box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .card-cell.used { background:#eae8e2; border-color:#c8c4bc; opacity:.82; }
 .card-cell.used .card-cell-title { color:var(--text2); }
 .card-used-badge { display:inline-flex; align-items:center; gap:4px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:9px; color:#888; background:#dedad3; border:0.5px solid #c4c0b8; border-radius:20px; padding:1px 7px; flex-shrink:0; }
@@ -3092,8 +3092,9 @@ function renderCardGrid(){
     const usedBadge='';
     const sourceBadge=isSource?`<div class="source-badge">📎 メディア${(ol.sourceSubItems||[]).length?` · ${ol.sourceSubItems.length}件`:''}</div>`:'';
     const sourceDomain=isSource&&ol.sourceUrl?(()=>{try{return new URL(ol.sourceUrl).hostname;}catch{return'';}})():'';
-    return`<div class="card-cell${isUsed?' used':''}${isSource?' source-card':''}${currentCardOutlineId===ol.id?' active':''}" onclick="openCardDetail('${ol.id}')">
-      <div class="card-cell-title">${hl(ol.title||'無題')}</div>
+    return`<div class="card-cell${isSource?' source-card':''}${currentCardOutlineId===ol.id?' active':''}${selectedCardIds.has(ol.id)?' selected':''}" data-id="${ol.id}" style="position:relative;" onclick="openCardDetail('${ol.id}')">
+      <input type="checkbox" ${selectedCardIds.has(ol.id)?'checked':''} style="position:absolute;top:8px;left:8px;width:15px;height:15px;cursor:pointer;accent-color:var(--teal);z-index:2;" onclick="event.stopPropagation();toggleCardSel('${ol.id}')" title="選択">
+      <div class="card-cell-title" style="padding-left:20px;">${hl(ol.title||'無題')}</div>
       ${isSource?`<div class="source-url-chip">${esc(sourceDomain||ol.sourceMemo?.slice(0,40)||'')}</div>`:''}
       <div class="card-cell-body" style="flex:1;">${isSource?((ol.sourceSubItems||[]).slice(0,5).map(si=>`<div class="card-cell-line">• ${esc(si.label)}</div>`).join('')||''):previewLines}</div>
       ${hasImg?`<img src="${ol.images[0]}" style="width:100%;height:72px;object-fit:cover;border-radius:6px;flex-shrink:0;" loading="lazy">`:''}

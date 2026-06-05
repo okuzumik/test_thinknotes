@@ -3092,10 +3092,7 @@ function renderCardGrid(){
     const usedBadge='';
     const sourceBadge=isSource?`<div class="source-badge">📎 メディア${(ol.sourceSubItems||[]).length?` · ${ol.sourceSubItems.length}件`:''}</div>`:'';
     const sourceDomain=isSource&&ol.sourceUrl?(()=>{try{return new URL(ol.sourceUrl).hostname;}catch{return'';}})():'';
-    return`<div class="card-cell${isSource?' source-card':''}${currentCardOutlineId===ol.id?' active':''}${selectedCardIds.has(ol.id)?' selected':''}" data-id="${ol.id}" style="position:relative;" onclick="openCardDetail('${ol.id}')">
-      <input type="checkbox" style="position:absolute;top:10px;left:10px;width:15px;height:15px;cursor:pointer;accent-color:var(--teal);" onclick="event.stopPropagation();toggleCardSel('${ol.id}')" title="選択">
-      <div class="card-cell-title">${hl(ol.title||'無題')}</div>
-      ${isSource?`<div class="source-url-chip">${esc(sourceDomain||ol.sourceMemo?.slice(0,40)||'')}</div>`:''}
+    return`<div class="card-cell${isSource?' source-card':''}${currentCardOutlineId===ol.id?' active':''}${selectedCardIds.has(ol.id)?' selected':''}" data-id="${ol.id}" onclick="openCardDetail('${ol.id}')">\n      <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;" onclick="event.stopPropagation()">\n        <input type="checkbox" style="width:14px;height:14px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;" onclick="toggleCardSel('${ol.id}')">\n        <div class="card-cell-title" style="flex:1;">${hl(ol.title||'無題')}</div>\n      </div>\n      ${isSource?`<div class="source-url-chip">${esc(sourceDomain||ol.sourceMemo?.slice(0,40)||'')}</div>`:''}
       <div class="card-cell-body" style="flex:1;">${isSource?((ol.sourceSubItems||[]).slice(0,5).map(si=>`<div class="card-cell-line">• ${esc(si.label)}</div>`).join('')||''):previewLines}</div>
       ${hasImg?`<img src="${ol.images[0]}" style="width:100%;height:72px;object-fit:cover;border-radius:6px;flex-shrink:0;" loading="lazy">`:''}
       ${labels?`<div style="display:flex;flex-wrap:wrap;gap:3px;flex-shrink:0;">${labels}</div>`:''}

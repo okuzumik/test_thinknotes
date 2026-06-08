@@ -851,23 +851,22 @@ body {
 .card-grid-toolbar { display:flex; align-items:center; gap:10px; padding:10px 1.5rem; border-bottom:0.5px solid var(--border); flex-shrink:0; background:var(--bg3); }
 .card-grid-search { flex:1; max-width:300px; padding:6px 12px; border:0.5px solid var(--border2); border-radius:20px; font-size:13px; font-family:inherit; color:var(--text); background:var(--bg2); outline:none; }
 .card-grid-count { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:11px; color:var(--text3); }
-.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(185px,1fr)); gap:10px; padding:1rem 1.5rem 3rem; overflow-y:auto; align-content:start; flex:1; }
+.card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); gap:8px; padding:.6rem 1rem 2rem; overflow-y:auto; align-content:start; flex:1; }
 .card-grid-empty { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text3); font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:13px; text-align:center; line-height:1.8; }
-.card-cell { position:relative; background:var(--bg2); border:0.5px solid var(--border); border-left:2px solid var(--border2); border-radius:var(--rsm); padding:11px; cursor:pointer; transition:border-color .12s,box-shadow .12s; display:flex; flex-direction:column; gap:5px; height:190px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+.card-cell { position:relative; background:var(--bg2); border:0.5px solid var(--border); border-left:2px solid var(--border2); border-radius:var(--rsm); padding:9px; cursor:pointer; transition:border-color .12s,box-shadow .12s; display:flex; flex-direction:column; gap:4px; height:165px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .card-cell.used { background:#eae8e2; border-color:#c8c4bc; opacity:.82; }
-.card-cell.used .card-cb-row { display:none; align-items:center; gap:6px; margin-bottom:0; flex-shrink:0; }
-body.card-select-mode .card-cb-row { display:flex !important; }
+.card-cb-row { display:flex; align-items:baseline; gap:6px; flex-shrink:0; }
+.card-cb-row input[type="checkbox"] { display:none; width:14px; height:14px; flex-shrink:0; }
+body.card-select-mode .card-cb-row input[type="checkbox"] { display:inline-block !important; }
 
 .card-used-badge { display:inline-flex; align-items:center; gap:4px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:9px; color:#888; background:#dedad3; border:0.5px solid #c4c0b8; border-radius:20px; padding:1px 7px; flex-shrink:0; }
 .card-used-badge.in-detail { font-size:11px; padding:3px 10px; cursor:pointer; }
 .card-used-badge.in-detail:hover { background:#d0ccc4; }
 .card-cell:hover { border-color:var(--border2); box-shadow:0 2px 8px rgba(0,0,0,.07); }
-.card-cb-row { display:none; align-items:center; gap:6px; margin-bottom:0; flex-shrink:0; }
-body.card-select-mode .card-cb-row { display:flex !important; }
 
-.card-cell-title { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:13px; font-weight:700; color:var(--text); line-height:1.4; flex-shrink:0; }
+.card-cell-title { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:11px; font-weight:700; color:#333; line-height:1.35; flex-shrink:0; }
 .card-cell-body { flex:1; overflow:hidden; }
-.card-cell-line { font-size:11px; line-height:1.65; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.card-cell-line { font-size:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.65; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .card-cell-foot { font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:10px; color:var(--text3); flex-shrink:0; }
 .card-cell-fade { position:absolute; bottom:0; left:0; right:0; height:36px; background:linear-gradient(transparent,var(--bg2)); pointer-events:none; border-radius:0 0 var(--rsm) var(--rsm); }
 /* 詳細パネル */
@@ -894,8 +893,8 @@ body.card-select-mode .card-cb-row { display:flex !important; }
 .card-label-filters::-webkit-scrollbar { display:none; }
 .card-label-pill { padding:3px 11px; border-radius:20px; border:0.5px solid var(--border2); background:var(--bg2); font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:11px; color:var(--text2); cursor:pointer; white-space:nowrap; flex-shrink:0; }
 .card-label-pill:hover { border-color:var(--accent-m); color:var(--accent); }
-.card-label-pill.active { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
-.card-label-tag { padding:3px 10px; border-radius:20px; background:var(--accent); color:#fff; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:11px; font-weight:600; }
+.card-label-pill.active { background:#2c4a7c; color:#fff; border-color:#2c4a7c; font-weight:600; }
+.card-label-tag { color:#6b88b8; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:9px; font-weight:600; }
 .card-label-input-wrap { display:flex; gap:6px; margin-top:.75rem; }
 .card-label-in { flex:1; padding:5px 10px; border:0.5px solid var(--border2); border-radius:20px; font-size:12px; font-family:inherit; color:var(--text); background:var(--bg3); outline:none; }
 .card-img-upload-btn { padding:5px 12px; background:none; border:0.5px solid var(--border2); border-radius:20px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:12px; color:var(--text2); cursor:pointer; }
@@ -906,15 +905,11 @@ body.card-select-mode .card-cb-row { display:flex !important; }
 /* メディアカード：スレートグレー */
 .card-cell.source-card { background:var(--source-l); border-color:var(--source-m); border-left:2px solid var(--source); }
 .card-cell.source-card:hover { border-color:var(--source-m); box-shadow:0 2px 8px rgba(90,100,120,.08); }
-.card-cell.source-card .card-cb-row { display:none; align-items:center; gap:6px; margin-bottom:0; flex-shrink:0; }
-body.card-select-mode .card-cb-row { display:flex !important; }
 
 .card-cell.source-card .card-cell-fade { background:linear-gradient(transparent,var(--source-l)); }
 /* スクラップカード：グリーン */
 .card-cell.scrap-card { background:#f4f8f4; border-color:#b8d4b8; border-left:2px solid #4a7a52; }
 .card-cell.scrap-card:hover { border-color:#b8d4b8; box-shadow:0 2px 8px rgba(60,107,70,.08); }
-.card-cell.scrap-card .card-cb-row { display:none; align-items:center; gap:6px; margin-bottom:0; flex-shrink:0; }
-body.card-select-mode .card-cb-row { display:flex !important; }
 
 .card-cell.scrap-card .card-cell-fade { background:linear-gradient(transparent,#f4f8f4); }
 .source-badge { display:inline-flex; align-items:center; gap:3px; font-family:'Hiragino Kaku Gothic ProN',sans-serif; font-size:9px; color:var(--source); background:var(--source-l); border:0.5px solid var(--source-m); border-radius:20px; padding:1px 7px; flex-shrink:0; }
@@ -1237,7 +1232,7 @@ body.card-select-mode .card-cb-row { display:flex !important; }
     <!-- 選択バー -->
     <div class="sel-bar" id="selBar">
       <span class="sel-label" id="selLabel">0件選択中</span>
-      <button class="sel-action" onclick="goToOutlineWithSel()">アウトラインに追加 →</button>
+      <button class="sel-action" onclick="goToOutlineWithSel()">カードを作成 →</button>
       <button class="sel-clear" onclick="clearSel()">解除</button>
     </div>
     <div class="feed" id="feed"></div>
@@ -1451,7 +1446,12 @@ body.card-select-mode .card-cb-row { display:flex !important; }
     <div class="card-grid-wrap" id="cardGridWrap">
       <div class="card-grid-toolbar">
         <input class="card-grid-search" id="cardGridSearch" placeholder="カードを検索…" oninput="renderCardGrid()">
-        <div class="card-label-filters" id="cardLabelFilters"></div>
+        <!-- コンパクトフィルターボタン -->
+        <div style="position:relative;flex-shrink:0;">
+          <button id="cardFilterBtn" onclick="toggleCardFilterPanel()" style="padding:4px 11px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
+            <span>絞り込み</span><span id="cardFilterCount" style="display:none;font-size:9px;background:#2c4a7c;color:#fff;border-radius:20px;padding:1px 5px;"></span><span id="cardFilterArrow">▾</span>
+          </button>
+        </div>
         <span class="card-grid-count" id="cardGridCount"></span>
         <button id="cardSelectModeBtn" onclick="toggleCardSelectMode()" style="padding:5px 12px;background:none;color:var(--text2);border:0.5px solid var(--border2);border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">複数カードを選択</button>
         <button onclick="newCardFromOutliner()" style="padding:5px 14px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">＋ 新規作成</button>
@@ -1463,12 +1463,22 @@ body.card-select-mode .card-cb-row { display:flex !important; }
         <button onclick="openReadWriteMode()" style="padding:5px 14px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">複数カードを全文表示</button>
         <button onclick="createNoteFromCards()" style="padding:5px 16px;background:#2d6a4f;color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-left:auto;">📝 このカードでノートを作成 →</button>
       </div>
-      <div class="card-grid" id="cardGrid"></div>
-      <div class="card-grid-empty" id="cardGridEmpty" style="display:none;">
+      <!-- メインエリア: フィルターサイドバー + カードグリッド -->
+      <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
+        <!-- 左：フィルターパネル -->
+        <div id="cardFilterSidebar" style="display:none;width:180px;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg3);overflow-y:auto;padding:12px 14px;">
+          <div id="cardFilterPanelContent"></div>
+        </div>
+        <!-- 右：カードグリッド -->
+        <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
+          <div class="card-grid" id="cardGrid"></div>
+          <div class="card-grid-empty" id="cardGridEmpty" style="display:none;">
         <div style="font-size:28px;margin-bottom:8px;">🗂️</div>
         保存済みアウトラインがありません<br>
         <span style="font-size:11px;margin-top:4px;display:block;">「思考」タブのアウトラインから保存してください</span>
       </div>
+        </div><!-- end right grid -->
+      </div><!-- end main flex -->
     </div>
   </div>
 
@@ -2767,7 +2777,7 @@ function renderNoteCardPicker(){
       ${sel?`<div style="position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">${selIdx}</div>`:''}
       <div style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:12px;font-weight:700;color:var(--text);padding-right:${sel?'22px':'0'};">${esc(ol.title||'無題')}</div>
       <div style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;color:var(--text3);">${ol.items.length}項目 · ${fmtDate(ol.updatedAt)}</div>
-      ${(ol.labels||[]).map(l=>`<span style="display:inline-block;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:9px;padding:1px 6px;border-radius:20px;background:var(--accent);color:#fff;">${esc(l)}</span>`).join('')}
+      ${(ol.labels||[]).map(l=>`<span style="display:inline-block;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:7px;padding:1px 6px;border-radius:20px;background:#2c4a7c;color:#fff;">${esc(l)}</span>`).join('')}
     </div>`;
   }).join('');
 }
@@ -3006,7 +3016,22 @@ function wfInsertText(text,extraLevel=0){
 // ─── Card View ───────────────────────────────────────────
 let currentCardOutlineId=null;
 
-let activeCardLabel=null;
+let activeCardLabels=new Set();
+let activeCardType=null;
+
+function renderCardTypeFilters(){
+  const el=document.getElementById('cardTypeFilters');if(!el)return;
+  // 現在使われているタイプを収集
+  const types=[...new Set(outlines.filter(ol=>!ol.isSource&&!ol.isScrap&&ol.cardType).map(ol=>ol.cardType))];
+  if(!types.length){el.innerHTML='';return;}
+  el.innerHTML=`<span class="card-label-pill${!activeCardType?' active':''}" onclick="setCardTypeFilter(null)" style="border-color:var(--border2);">すべて</span>`
+    +types.map(t=>{const c=getCardTypeColor(t);return`<span class="card-label-pill${activeCardType===t?' active':''}" onclick="setCardTypeFilter('${esc(t)}')" style="${activeCardType===t?`background:${c};color:#fff;border-color:${c};`:`color:${c};border-color:${c};`}">${esc(t)}</span>`;}).join('');
+}
+
+function setCardTypeFilter(t){
+  activeCardType=t;renderCardTypeFilters();renderCardGrid();
+  document.querySelectorAll('#cardFilterPanelContent input[type="radio"]').forEach(function(r){r.checked=(r.dataset.val===t)||(t===null&&r.dataset.val==='');});
+}
 let activeSourceLabel=null;
 let activeScrapLabel=null;
 
@@ -3016,15 +3041,93 @@ function renderLabelBar(elId, pool, activeLabel, callbackName){
   const set=new Set();
   pool.forEach(ol=>(ol.labels||[]).forEach(l=>set.add(l)));
   if(!set.size){el.innerHTML='';return;}
-  el.innerHTML=`<span class="card-label-pill${!activeLabel?' active':''}" onclick="${callbackName}(null)">すべて</span>`
-    +[...set].map(l=>`<span class="card-label-pill${activeLabel===l?' active':''}" onclick="${callbackName}('${esc(l)}')">${esc(l)}</span>`).join('');
+  const isSet=activeLabel instanceof Set;
+  const isActive=l=>isSet?activeLabel.has(l):(activeLabel===l);
+  const hasAny=isSet?activeLabel.size>0:!!activeLabel;
+  el.innerHTML=`<span class="card-label-pill${!hasAny?' active':''}" onclick="${callbackName}(null)">すべて</span>`
+    +[...set].map(l=>`<span class="card-label-pill${isActive(l)?' active':''}" onclick="${callbackName}('${esc(l)}')">${esc(l)}</span>`).join('');
 }
 
-function renderCardLabelFilters(){
-  renderLabelBar('cardLabelFilters',
-    outlines.filter(ol=>!ol.isSource&&!ol.isScrap),
-    activeCardLabel,'setCardLabelFilter');
+function renderCardLabelFilters(){renderCardFilterUI();}
+function renderCardTypeFilters(){renderCardFilterUI();}
+
+function cfTypeCheck(el){
+  var val=el.dataset.val||null;
+  // 同じタイプを再チェックで解除、別タイプで切り替え
+  setCardTypeFilter(activeCardType===val?null:val);
+  // 他のタイプのチェックを外す（単一選択）
+  document.querySelectorAll('#cardFilterPanelContent input[onchange="cfTypeCheck(this)"]').forEach(function(cb){
+    cb.checked=(cb.dataset.val===activeCardType);
+  });
 }
+function cfTypeChange(el){setCardTypeFilter(el.dataset.val||null);}
+function cfLabelChange(el){setCardLabelFilter(el.dataset.val||null);}
+
+function toggleCardFilterPanel(){
+  const sidebar=document.getElementById('cardFilterSidebar');
+  const arrow=document.getElementById('cardFilterArrow');
+  if(!sidebar)return;
+  const open=sidebar.style.display!=='none';
+  sidebar.style.display=open?'none':'block';
+  if(arrow)arrow.textContent=open?'▾':'▴';
+  if(!open)renderCardFilterPanelContent();
+}
+
+function renderCardFilterUI(){
+  // チップ表示は不要 - カウントバッジのみ更新
+  const count=document.getElementById('cardFilterCount');
+  const btn=document.getElementById('cardFilterBtn');
+  const total=(activeCardType?1:0)+activeCardLabels.size;
+  if(count){count.textContent=total;count.style.display=total?'inline':'none';}
+  if(btn)btn.style.borderColor=total?'#2c4a7c':'var(--border2)';
+}
+
+function renderCardFilterPanelContent(){
+  var el=document.getElementById('cardFilterPanelContent');if(!el)return;
+  var pool=outlines.filter(function(ol){return !ol.isSource&&!ol.isScrap;});
+  var typeArr=[...new Set(pool.filter(function(ol){return ol.cardType;}).map(function(ol){return ol.cardType;}))];
+  var labelArr=[...new Set(pool.flatMap(function(ol){return ol.labels||[];}))];
+  var html='';
+  if(typeArr.length){
+    html+='<div style="font-size:9px;color:var(--text3);font-family:Hiragino,sans-serif;margin-bottom:4px;letter-spacing:.08em;">タイプ</div>';
+    html+=typeArr.map(function(t){
+      var col=getCardTypeColor(t);
+      var on=activeCardType===t;
+      return '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:3px 0;">'
+        +'<input type="checkbox" '+(on?'checked':'')
+        +' data-val="'+esc(t)+'" onchange="cfTypeCheck(this)" style="accent-color:'+col+';">'
+        +'<span style="font-size:11px;color:'+col+';">'+esc(t)+'</span></label>';
+    }).join('');
+  }
+  if(typeArr.length&&labelArr.length) html+='<div style="border-top:0.5px solid var(--border);margin:8px 0;"></div>';
+  if(labelArr.length){
+    html+='<div style="font-size:9px;color:var(--text3);font-family:Hiragino,sans-serif;margin-bottom:4px;letter-spacing:.08em;">ラベル（複数可）</div>';
+    html+=labelArr.map(function(l){
+      var on=activeCardLabels.has(l);
+      return '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:3px 0;">'
+        +'<input type="checkbox" '+(on?'checked':'')
+        +' data-val="'+esc(l)+'" onchange="cfLabelChange(this)" style="accent-color:#2c4a7c;">'
+        +'<span style="font-size:11px;color:#2c4a7c;">'+esc(l)+'</span></label>';
+    }).join('');
+  }
+  html+='<div style="border-top:0.5px solid var(--border);margin-top:10px;padding-top:8px;">'
+    +'<button onclick="resetCardFilters();renderCardFilterPanelContent();" style="font-size:10px;color:var(--red);background:none;border:none;cursor:pointer;font-family:inherit;">✕ リセット</button></div>';
+  el.innerHTML=html;
+}
+function resetCardFilters(){activeCardLabels.clear();activeCardType=null;renderCardFilterUI();renderCardGrid();}
+
+// パネル外クリックで閉じる
+document.addEventListener('click',e=>{
+  const panel=document.getElementById('cardFilterPanel');
+  const btn=document.getElementById('cardFilterBtn');
+  if(panel&&panel.style.display!=='none'&&!panel.contains(e.target)&&!btn?.contains(e.target)){
+    panel.style.display='none';
+    const arrow=document.getElementById('cardFilterArrow');
+    if(arrow)arrow.textContent='▾';
+  }
+},{capture:true});
+
+
 function renderSourceLabelFilters(){
   renderLabelBar('sourceLabelFilters',
     outlines.filter(ol=>ol.isSource),
@@ -3035,10 +3138,10 @@ function renderScrapLabelFilters(){
     outlines.filter(ol=>ol.isScrap),
     activeScrapLabel,'setScrapLabelFilter');
 }
-function setCardLabelFilter(l){activeCardLabel=l;renderCardLabelFilters();renderCardGrid();}
+function setCardLabelFilter(l){if(!l){activeCardLabels.clear();}else{if(activeCardLabels.has(l))activeCardLabels.delete(l);else activeCardLabels.add(l);}renderCardLabelFilters();renderCardGrid();}
 function setSourceLabelFilter(l){activeSourceLabel=l;renderMatSourceGrid();}
 function setScrapLabelFilter(l){activeScrapLabel=l;renderScrapGrid();}
-function setCardLabel(label){activeCardLabel=label;renderCardLabelFilters();renderCardGrid();}
+function setCardLabel(label){activeCardLabels.clear();if(label)activeCardLabels.add(label);renderCardLabelFilters();renderCardGrid();}
 
 function renderCardView(){
   closeCardDetail();
@@ -3048,11 +3151,62 @@ function renderCardView(){
 
 let _cardGridPool=[];
 
+function getCardTypeColor(type){
+  if(!type)return'#6b7280';
+  const map={
+    'キーワード':'#2c7a7b',
+    'テーゼ':    '#6b46c1',
+    '記録':      '#b7791f',
+    'アイデア':  '#c05621',
+    '思考':      '#2b6cb0',
+    'メモ':      '#276749',
+    '疑問':      '#b83280',
+    '引用':      '#744210',
+    '構造':      '#2c5282',
+    '反論':      '#9b2335',
+  };
+  return map[type]||'#6b7280';
+}
+
+function toggleCardFrontMatter(){
+  const fm=document.getElementById('cardFrontMatter');
+  const icon=document.getElementById('fmToggleIcon');
+  if(!fm)return;
+  const open=fm.style.display!=='none';
+  fm.style.display=open?'none':'block';
+  if(icon)icon.textContent=open?'▸':'▾';
+  if(!open)setTimeout(()=>document.getElementById('cardTypeInput')?.focus(),50);
+}
+
+function saveCardType(val){
+  const ol=outlines.find(x=>x.id===currentCardOutlineId);if(!ol)return;
+  ol.cardType=val.trim()||null;
+  ol.updatedAt=Date.now();save();
+  // ボーダー色を即時反映
+  const card=document.getElementById('cardDetailCard');
+  const tc=getCardTypeColor(ol.cardType);
+  if(card)card.style.borderLeft=ol.cardType?('3px solid '+tc):'';
+  // フロントマタートグルのタイプバッジを更新
+  openCardDetail(currentCardOutlineId);
+}
+
+
+
+
+
+
+
+
+
+
+
+
 function renderCardGrid(){
   const q=(document.getElementById('cardGridSearch')?.value||'').trim().toLowerCase();
   let pool=[...outlines].sort((a,b)=>b.updatedAt-a.updatedAt)
     .filter(ol=>!ol.isSource&&!ol.isScrap)
-    .filter(ol=>!activeCardLabel||(ol.labels||[]).includes(activeCardLabel));
+    .filter(ol=>!activeCardLabels.size||[...activeCardLabels].every(l=>(ol.labels||[]).includes(l)))
+    .filter(ol=>!activeCardType||ol.cardType===activeCardType);
 
   if(q){
     pool=pool.filter(ol=>{
@@ -3101,7 +3255,7 @@ function renderCardGrid(){
       const lvl=it.level||0;
       let text=it.text||'';
       if(!it.text&&it.id&&!it.id.startsWith('reply:')){const p=posts.find(x=>x.id===it.id);text=p?cleanText(p.content):'';}
-      if(!text.trim())return'';
+      // 空行も表示（バレットなし）
       const isMatch=q&&text.toLowerCase().includes(q);
       let disp=text.split('\n')[0];
       if(isMatch){
@@ -3109,21 +3263,27 @@ function renderCardGrid(){
         if(idx>40)disp='…'+disp.slice(Math.max(0,idx-15));
         disp=disp.slice(0,80);
       } else { disp=disp.slice(0,60); }
-      return`<div class="card-cell-line" style="padding-left:${lvl*8}px;${q&&!isMatch?'opacity:.35;':''}">${hl(disp)}</div>`;
+      return'<div class="card-cell-line" style="padding-left:'+(lvl*8)+'px;'+(q&&!isMatch?'opacity:.35;':'')+'">'+(hl(disp))+'</div>';
     }).filter(Boolean).join('');
-    const labels=(ol.labels||[]).map(l=>`<span style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:9px;padding:1px 7px;border-radius:20px;background:var(--accent);color:#fff;">${esc(l)}</span>`).join('');
+    const labels=(ol.labels||[]).map(l=>'<span style="font-size:8px;color:#6b88b8;font-weight:600;">'+esc(l)+'</span>').join(' ');
     const hasImg=ol.images?.length;
     const isUsed=false;
     const isSource=!!(ol.isSource);
     const usedBadge='';
-    const sourceBadge=isSource?`<div class="source-badge">📎 メディア${(ol.sourceSubItems||[]).length?` · ${ol.sourceSubItems.length}件`:''}</div>`:'';
+    const sourceBadge=isSource?('<div class="source-badge">📎 メディア'+((ol.sourceSubItems||[]).length?' · '+ol.sourceSubItems.length+'件':'')+'</div>'):''
     const sourceDomain=isSource&&ol.sourceUrl?(()=>{try{return new URL(ol.sourceUrl).hostname;}catch{return'';}})():'';
-    return`<div class="card-cell${isSource?' source-card':''}${currentCardOutlineId===ol.id?' active':''}${selectedCardIds.has(ol.id)?' selected':''}" data-id="${ol.id}" onclick="openCardDetail('${ol.id}')">\n      <div class="card-cb-row" onclick="event.stopPropagation()"><input type="checkbox" style="width:14px;height:14px;accent-color:var(--teal);cursor:pointer;" onclick="cardToggleSel('${ol.id}',event)"><span class="card-cell-title" style="flex:1;">${hl(ol.title||'無題')}</span></div>\n      <div class="card-cell-body" style="flex:1;">${isSource?((ol.sourceSubItems||[]).slice(0,5).map(si=>`<div class="card-cell-line">• ${esc(si.label)}</div>`).join('')||''):previewLines}</div>
-      ${hasImg?`<img src="${ol.images[0]}" style="width:100%;height:72px;object-fit:cover;border-radius:6px;flex-shrink:0;" loading="lazy">`:''}
+    const _tc=getCardTypeColor(ol.cardType);const _tcStyle=ol.cardType?'box-shadow:0 2px 8px rgba(0,0,0,.08);':'';
+    return`<div class="card-cell${isSource?' source-card':''}${currentCardOutlineId===ol.id?' active':''}${selectedCardIds.has(ol.id)?' selected':''}" data-id="${ol.id}" style="${_tcStyle}" onclick="openCardDetail('${ol.id}')">
+      <div class="card-cb-row"><input type="checkbox" style="width:14px;height:14px;accent-color:var(--teal);cursor:pointer;" onclick="cardToggleSel('${ol.id}',event)"><span class="card-cell-title" style="flex:1;">${hl(ol.title||'無題')}</span></div>
+      <div style="height:1.5px;background:${_tc||'var(--border)'};margin:2px 0;border-radius:1px;opacity:${ol.cardType?'1':'0'};"></div>
+      ${hasImg
+        ?`<img src="${ol.images[0]}" style="width:100%;max-height:90px;object-fit:contain;border-radius:4px;flex-shrink:0;background:var(--bg3);" loading="lazy">`
+        :`<div class="card-cell-body" style="flex:1;">${isSource?((ol.sourceSubItems||[]).slice(0,5).map(si=>`<div class="card-cell-line">• ${esc(si.label)}</div>`).join('')||''):previewLines}</div>`}
       ${labels?`<div style="display:flex;flex-wrap:wrap;gap:3px;flex-shrink:0;">${labels}</div>`:''}
       ${sourceBadge}${usedBadge}
-      <div class="card-cell-foot">${isSource?(ol.sourceSubItems||[]).length+'件のサブアイテム':ol.items.length+'項目'} · ${fmtDate(ol.updatedAt)}</div>
+
     </div>`;
+
   }).join('');
 }
 
@@ -3186,7 +3346,7 @@ function cdOnInput(div){
   popup.innerHTML=cands.map((ol,i)=>`
     <div class="cls-item" data-title="${esc(ol.title||'無題')}" data-i="${i}"
       style="padding:7px 12px;cursor:pointer;font-size:13px;color:var(--text);border-bottom:0.5px solid var(--border);font-family:'Hiragino Kaku Gothic ProN',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:${i===0?'var(--bg3)':'var(--bg)'};"
-      onmousedown="event.preventDefault();cdSuggestSelect('${esc(ol.title||'無題')}')"
+      onmousedown="event.preventDefault();cdSuggestSelect(this.dataset.title)"
       onmouseover="cdSuggestHover(${i})"
     >${esc(ol.title||'無題')}</div>`).join('');
   _cdSuggestDiv=popup;
@@ -3261,21 +3421,37 @@ document.addEventListener('mousedown',e=>{
   if(!e.target.closest('#cardLinkSuggest'))cdHideSuggest();
 });
 
+let _cdMoving=false;
 function cdOnFocus(div){
-  // フォーカス時：プレーンテキストに切り替え
   const text=div.dataset.text||'';
   div.innerHTML='';
   div.textContent=text;
+  // HR行フォーカス時は表示を切り替えて --- テキストを見せる
+  if(text==='---'){
+    div.style.cssText='outline:none;cursor:text;width:auto;height:auto;overflow:visible;white-space:pre;color:var(--text3);font-size:11px;';
+    const line=div.parentElement?.querySelector('div[style*="border-top"]');
+    if(line)line.style.display='none';
+  }
   const r=document.createRange();r.selectNodeContents(div);r.collapse(false);
   window.getSelection().removeAllRanges();window.getSelection().addRange(r);
 }
 function cdOnBlur(div){
-  // ブラー時：リンクをレンダリング
+  if(_cdMoving)return;
   const olId=div.dataset.ol;
   const idx=parseInt(div.dataset.idx);
   const text=div.textContent;
   div.dataset.text=text;
-  div.innerHTML=linkifyCard(text);
+  const m=cardItemMeta(text);
+  // HR行: テキストを隠して線を戻す
+  if(m.type==='hr'){
+    div.textContent='---';
+    div.style.cssText='width:0;height:0;overflow:hidden;outline:none;';
+    const line=div.parentElement?.querySelector('div[style*="border-top"]');
+    if(line)line.style.display='';
+  } else {
+    div.innerHTML=linkifyCard(m.display||text);
+    if(m.textStyle)div.style.cssText='outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;'+m.textStyle;
+  }
   const ol=outlines.find(x=>x.id===olId);
   if(ol&&ol.items[idx]){ol.items[idx].text=text;ol.updatedAt=Date.now();save();}
 }
@@ -3295,43 +3471,142 @@ function cdAddItem(olId,afterIdx){
   openCardDetail(olId);
   setTimeout(()=>cdFocus(afterIdx+1),50);
 }
-function cdFocus(idx){
-  const divs=document.querySelectorAll('#cdItems .card-detail-text');
-  if(divs[idx])divs[idx].focus();
+function cdFocus(idx,atStart){
+  setTimeout(()=>{
+    const divs=document.querySelectorAll('#cdItems .card-detail-text');
+    const el=divs[idx];if(!el)return;
+    el.focus();
+    if(atStart){
+      // カーソルを先頭に
+      const r=document.createRange();
+      r.setStart(el.firstChild||el,0);r.collapse(true);
+      const s=window.getSelection();s.removeAllRanges();s.addRange(r);
+    }
+  },10);
 }
-function saveCardItemText(div){
-  // cdOnBlur で処理するためここは空でよい
+
+// アイテム部分だけ再レンダリング（onblur誤発火を防ぐ）
+function cdRenderItems(ol){
+  const container=document.getElementById('cdItems');
+  if(!container)return;
+  _cdMoving=true;
+  container.innerHTML=ol.items.map((it,i)=>{
+    const lvl=it.level||0;
+    const text=it.text||'';
+    const m=cardItemMeta(text);
+    if(m.type==='hr')
+      return '<div class="cd-item" data-idx="'+i+'" style="display:flex;align-items:center;padding:'+(lvl*22)+'px 0 0;">'+'<div style="flex:1;border-top:2px solid var(--border2);margin:6px 0;"></div>'+'<div class="card-detail-text" contenteditable="true" spellcheck="false" data-ol="'+ol.id+'" data-idx="'+i+'" data-text="---"'+' style="width:0;height:0;overflow:hidden;outline:none;"'+' onfocus="cdOnFocus(this)" onblur="cdOnBlur(this)" onkeydown="onCardDetailItemKey(event,this,\''+ol.id+'\','+i+')">---</div>'+'</div>';
+    const bVis=(!text||m.hideBullet)?'hidden':'visible';
+    const displayHTML=linkifyCard(m.display||text);
+    return '<div class="cd-item" data-idx="'+i+'" style="display:flex;align-items:baseline;gap:6px;padding:2px 0;padding-left:'+(lvl*22)+'px;'+m.wrapStyle+'">'
+      +'<span class="card-detail-bullet" style="cursor:pointer;user-select:none;flex-shrink:0;visibility:'+bVis+'" onclick="cdToggleLevel(\''+ol.id+'\','+i+')">•</span>'
+      +'<div class="card-detail-text" contenteditable="true" spellcheck="false"'
+      +' data-ol="'+ol.id+'" data-idx="'+i+'" data-text="'+esc(text)+'"'
+      +' style="outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;'+m.textStyle+'"'
+      +' onfocus="cdOnFocus(this)" onblur="cdOnBlur(this)"'
+      +' onkeydown="onCardDetailItemKey(event,this,\''+ol.id+'\','+i+')"'
+      +' oninput="cdOnInput(this)"'
+      +'>'+displayHTML+'</div>'
+      +'</div>';
+  }).join('');
+  setTimeout(()=>{_cdMoving=false;},50);
 }
+
+// 全アイテムのテキストをol.itemsに保存
+function cdSaveAllTexts(ol){
+  document.querySelectorAll('#cdItems .card-detail-text').forEach(el=>{
+    const i=parseInt(el.dataset.idx);
+    if(!isNaN(i)&&ol.items[i])ol.items[i].text=el.textContent.trim()||el.dataset.text||'';
+  });
+}
+
 function onCardDetailItemKey(e,div,olId,idx){
-  if(e.key==='Enter'&&!e.isComposing){
+  if(e.isComposing)return;
+  const ol=outlines.find(x=>x.id===olId);if(!ol)return;
+
+  if(e.key==='Enter'){
     e.preventDefault();
-    const ol=outlines.find(x=>x.id===olId);if(!ol)return;
-    div.dataset.text=div.textContent;
-    ol.items[idx].text=div.textContent;
-    const newItem={id:uid(),text:'',level:ol.items[idx].level||0};
-    ol.items.splice(idx+1,0,newItem);
-    ol.updatedAt=Date.now();save();
-    openCardDetail(olId);
-    setTimeout(()=>cdFocus(idx+1),50);
-  } else if(e.key==='Backspace'&&div.textContent===''&&!e.isComposing){
+    cdSaveAllTexts(ol);
+    const text=ol.items[idx].text||'';
+    const curLevel=ol.items[idx].level||0;
+    let pos=text.length;
+    const sel=window.getSelection();
+    if(sel&&sel.rangeCount>0){
+      try{
+        const r=document.createRange();
+        r.selectNodeContents(div);
+        r.setEnd(sel.getRangeAt(0).endContainer,sel.getRangeAt(0).endOffset);
+        pos=r.toString().length;
+      }catch(err){pos=text.length;}
+    }
+    if(pos===0){
+      ol.items.splice(idx,0,{id:uid(),text:'',level:curLevel});
+      ol.updatedAt=Date.now();save();
+      cdRenderItems(ol);
+      cdFocus(idx+1,true);
+    } else {
+      const before=text.slice(0,pos);
+      const after=text.slice(pos);
+      ol.items[idx].text=before;
+      ol.items.splice(idx+1,0,{id:uid(),text:after,level:curLevel});
+      ol.updatedAt=Date.now();save();
+      cdRenderItems(ol);
+      cdFocus(idx+1,true);
+    }
+
+  } else if(e.key==='Backspace'&&!div.textContent.trim()&&!e.isComposing){
     e.preventDefault();
-    const ol=outlines.find(x=>x.id===olId);if(!ol||ol.items.length<=1)return;
+    if(ol.items.length<=1)return;
     ol.items.splice(idx,1);
     ol.updatedAt=Date.now();save();
-    openCardDetail(olId);
-    setTimeout(()=>{
-      const divs=document.querySelectorAll('#cdItems .card-detail-text');
-      const prev=divs[Math.max(0,idx-1)];
-      if(prev)prev.focus();
-    },50);
+    cdRenderItems(ol);
+    const prevIdx=Math.max(0,idx-1);
+    cdFocus(prevIdx,false);
+
   } else if(e.key==='Tab'){
     e.preventDefault();
-    const ol=outlines.find(x=>x.id===olId);if(!ol)return;
-    div.dataset.text=div.textContent;ol.items[idx].text=div.textContent;
+    cdSaveAllTexts(ol);
     ol.items[idx].level=e.shiftKey?Math.max(0,(ol.items[idx].level||0)-1):(ol.items[idx].level||0)+1;
     ol.updatedAt=Date.now();save();
-    openCardDetail(olId);
-    setTimeout(()=>cdFocus(idx),50);
+    cdRenderItems(ol);
+    cdFocus(idx,false);
+
+  } else if(e.key==='ArrowLeft'){
+    const sel=window.getSelection();
+    let atStart=false;
+    if(sel&&sel.rangeCount>0){
+      try{
+        const r=document.createRange();
+        r.selectNodeContents(div);
+        r.setEnd(sel.getRangeAt(0).endContainer,sel.getRangeAt(0).endOffset);
+        atStart=r.toString().length===0;
+      }catch(err){}
+    }
+    if(atStart&&idx>0){
+      e.preventDefault();
+      cdFocus(idx-1,false);
+    }
+
+  } else if(e.key==='ArrowUp'&&e.altKey){
+    e.preventDefault();
+    if(idx===0)return;
+    cdSaveAllTexts(ol);
+    const tmp=ol.items.splice(idx,1)[0];
+    ol.items.splice(idx-1,0,tmp);
+    ol.updatedAt=Date.now();save();
+    cdRenderItems(ol);
+    cdFocus(idx-1,false);
+
+  } else if(e.key==='ArrowDown'&&e.altKey){
+    e.preventDefault();
+    if(idx>=ol.items.length-1)return;
+    cdSaveAllTexts(ol);
+    const tmp=ol.items.splice(idx,1)[0];
+    ol.items.splice(idx+1,0,tmp);
+    ol.updatedAt=Date.now();save();
+    cdRenderItems(ol);
+    cdFocus(idx+1,false);
+
   } else if(e.key==='ArrowUp'&&!e.shiftKey){
     const divs=document.querySelectorAll('#cdItems .card-detail-text');
     if(divs[idx-1]){e.preventDefault();divs[idx-1].focus();}
@@ -3340,7 +3615,6 @@ function onCardDetailItemKey(e,div,olId,idx){
     if(divs[idx+1]){e.preventDefault();divs[idx+1].focus();}
   }
 }
-
 
 function renderCardSourceRefSection(ol){
   if(!ol)return'';
@@ -3410,17 +3684,44 @@ function clearCardSourceRef(){
 }
 
 // ── カード間リンク [[カード名]] ─────────────────────────────
+// カード行のマークダウン解析（見出しなし）
+function cardItemMeta(text){
+  const t=text||'';
+  if(t==='---'||t==='***')
+    return{type:'hr',display:'',hideBullet:true,
+      wrapStyle:'border-top:2px solid var(--border2);margin:6px 0;padding:0;',textStyle:''};
+  if(t.startsWith('> '))
+    return{type:'quote',display:t.slice(2),hideBullet:true,
+      wrapStyle:'border-left:3px solid var(--border2);padding-left:8px;margin:1px 0;',
+      textStyle:'color:var(--text2);font-style:italic;'};
+  return{type:'text',display:t,hideBullet:false,wrapStyle:'',textStyle:''};
+}
+
+// インラインマークダウン＋カードリンク＋URL描画
 function linkifyCard(text){
   if(!text)return'';
-  return text.replace(/\[\[([^\]]+)\]\]/g,(match,title)=>{
-    const target=outlines.find(x=>x.title===title&&!x.isSource&&!x.isScrap);
-    if(target){
-      return`<span class="card-link" data-card-id="${target.id}" onmousedown="event.preventDefault();openCardDetail('${target.id}')" title="${esc(title)}">${esc(title)}</span>`;
-    }
-    // 存在しないカード → クリックで新規作成
-    return`<span class="card-link new" data-card-title="${esc(title)}" onmousedown="event.preventDefault();createCardFromLink('${esc(title)}')" title="新規カードを作成: ${esc(title)}">${esc(title)}</span>`;
+  const t=text;
+  // [[card links]]
+  let html=esc(t).replace(/\[\[([^\]]+)\]\]/g,(match,title)=>{
+    const raw=title;
+    const target=outlines.find(x=>x.title===raw&&!x.isSource&&!x.isScrap);
+    if(target)
+      return`<span class="card-link" data-card-id="${target.id}" onmousedown="event.preventDefault();openCardDetail('${target.id}')" title="${esc(raw)}">${esc(raw)}</span>`;
+    return`<span class="card-link new" data-card-title="${esc(raw)}" onmousedown="event.preventDefault();createCardFromLink('${esc(raw)}')" title="新規カードを作成: ${esc(raw)}">${esc(raw)}</span>`;
   });
+  // **bold**
+  html=html.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  // URL → 短縮リンク
+  html=html.replace(/(https?:\/\/[^\s<"]+)/g,url=>{
+    try{
+      const u=new URL(url);
+      const short=(u.hostname.replace(/^www\./,'')+u.pathname).slice(0,30);
+      return`<a href="${url}" target="_blank" contenteditable="false" onmousedown="window.open('${url}','_blank');event.preventDefault();" style="color:var(--accent-d);text-decoration:none;border-bottom:1px solid var(--accent-m);white-space:nowrap;font-size:inherit;">${short}</a>`;
+    }catch(e){return url;}
+  });
+  return html;
 }
+
 
 function createCardFromLink(title){
   // 同名カードが存在しないことを確認（競合チェック）
@@ -3516,21 +3817,25 @@ function openCardDetail(outlineId){
       if(p?.images?.length)postImgsHtml=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${p.images.map(src=>`<img src="${src}" onclick="openLightbox('${src}')" class="card-detail-card-image" loading="lazy">`).join('')}</div>`;
     }
     // フォーカス時はテキスト編集、それ以外はリンクレンダリング
-    return`<div class="cd-item" data-idx="${i}" style="display:flex;align-items:baseline;gap:6px;padding:2px 0;padding-left:${lvl*22}px;">
-      <span class="card-detail-bullet" style="cursor:pointer;user-select:none;flex-shrink:0;" onclick="cdToggleLevel('${ol.id}',${i})">•</span>
+    const m=cardItemMeta(text);
+    if(m.type==='hr') return`<div class="cd-item" data-idx="${i}" style="display:flex;align-items:center;padding-left:${lvl*22}px;"><div style="flex:1;border-top:2px solid var(--border2);margin:6px 0;"></div><div class="card-detail-text" contenteditable="true" spellcheck="false" data-ol="${ol.id}" data-idx="${i}" data-text="---" style="width:0;height:0;overflow:hidden;outline:none;" onfocus="cdOnFocus(this)" onblur="cdOnBlur(this)" onkeydown="onCardDetailItemKey(event,this,'${ol.id}',${i})">---</div></div>`;
+    const bVis=(!text||m.hideBullet)?'hidden':'visible';
+    return`<div class="cd-item" data-idx="${i}" style="display:flex;align-items:baseline;gap:6px;padding:2px 0;padding-left:${lvl*22}px;${m.wrapStyle}">
+      <span class="card-detail-bullet" style="cursor:pointer;user-select:none;flex-shrink:0;visibility:${bVis};" onclick="cdToggleLevel('${ol.id}',${i})">•</span>
       <div style="flex:1;">
         <div class="card-detail-text" contenteditable="true" spellcheck="false"
           data-ol="${ol.id}" data-idx="${i}" data-text="${esc(text)}"
-          style="outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;"
+          style="outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;${m.textStyle}"
           onfocus="cdOnFocus(this)"
           onblur="cdOnBlur(this)"
           onkeydown="onCardDetailItemKey(event,this,'${ol.id}',${i})"
           oninput="cdOnInput(this)"
-        >${linkifyCard(text)}</div>
+        >${linkifyCard(m.display||text)}</div>
         ${postImgsHtml}
       </div>
     </div>`;
-  }).join('')+'</div>'+'<button onclick="cdAddItem(\''+ol.id+'\',-1)" style="margin-top:6px;padding:4px 12px;background:none;border:0.5px dashed var(--border2);border-radius:var(--rsm);font-size:11px;font-family:\'Hiragino Kaku Gothic ProN\',sans-serif;color:var(--text3);cursor:pointer;">＋ 項目を追加</button>';
+  }).filter(Boolean).join('')+'</div>';
+
   // カード自体の画像
   const cardImgsHtml=images.length?`<div class="card-detail-card-images">${images.map((src,i)=>`
     <div style="position:relative;display:inline-block;">
@@ -3538,7 +3843,30 @@ function openCardDetail(outlineId){
       <button onclick="removeCardImage(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>`).join('')}</div>`:'';
 
-  body.innerHTML=`<div class="card-detail-card" style="${ol.isSource?'border-left:3px solid var(--source);background:var(--source-l);':''}">
+  const typeColor=getCardTypeColor(ol.cardType);
+  const frontMatterHtml=ol.isSource?'':`
+    <div id="cardFrontMatter" style="display:none;margin-bottom:10px;padding:8px 12px;background:var(--bg2);border-radius:var(--rsm);border:1px solid var(--border2);box-shadow:inset 0 1px 3px rgba(0,0,0,.03);font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+      <div style="font-size:9px;color:var(--text3);letter-spacing:.1em;margin-bottom:6px;">FRONT MATTER</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:10px;color:var(--text3);min-width:32px;">タイプ</span>
+        <input id="cardTypeInput" value="${esc(ol.cardType||'')}" placeholder="キーワード / テーゼ / 記録 / アイデア / 思考"
+          list="cardTypeList"
+          style="flex:1;padding:4px 8px;border:0.5px solid var(--border2);border-radius:var(--rsm);font-size:11px;font-family:inherit;outline:none;background:var(--bg);"
+          onchange="saveCardType(this.value)"
+          onblur="saveCardType(this.value)">
+        <datalist id="cardTypeList">
+          <option value="キーワード"><option value="テーゼ"><option value="記録"><option value="アイデア"><option value="思考"><option value="メモ"><option value="疑問"><option value="引用"><option value="構造"><option value="反論">
+        </datalist>
+      </div>
+    </div>`;
+
+  body.innerHTML=`<div class="card-detail-card" style="${ol.isSource?'border-left:3px solid var(--source);background:var(--source-l);':''}" id="cardDetailCard">
+    <!-- フロントマタートグル -->
+    ${ol.isSource?'':`<div onclick="toggleCardFrontMatter()" style="display:flex;align-items:center;gap:5px;margin-bottom:8px;cursor:pointer;user-select:none;">
+      ${ol.cardType?`<span style="font-size:9px;padding:1px 6px;border-radius:2px;background:${typeColor};color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;letter-spacing:.05em;">${esc(ol.cardType)}</span>`:'<span style="font-size:9px;color:var(--text3);font-family:\'Hiragino Kaku Gothic ProN\',sans-serif;">── フロントマター</span>'}
+      <span id="fmToggleIcon" style="font-size:9px;color:var(--text3);">▸</span>
+    </div>`}
+    ${frontMatterHtml}
     <div class="card-detail-card-title" contenteditable="true" spellcheck="false"
       onblur="saveCardTitle(this);this.style.borderBottomColor='transparent'"
       onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
@@ -3546,7 +3874,7 @@ function openCardDetail(outlineId){
       style="outline:none;cursor:text;border-bottom:1.5px dashed transparent;transition:border-color .15s;${ol.isSource?'color:var(--source);':''}"
     >${esc(ol.title||'無題')}</div>
     <div class="card-detail-card-meta">
-      <span style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text3);">${ol.isSource?(ol.sourceSubItems||[]).length+'件のサブアイテム':ol.items.length+'項目'} · ${fmtDate(ol.updatedAt)}</span>
+      <span style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text3);">${fmtDate(ol.updatedAt)}</span>
       ${ol.isSource?`<span class="source-badge">📎 メディア</span>`:''}
       ${labels.map((lb,i)=>`<span class="card-label-tag" style="cursor:pointer;" onclick="removeCardLabel(${i})" title="クリックで削除">${esc(lb)} ✕</span>`).join('')}
     </div>
@@ -3766,7 +4094,7 @@ function renderCard(outlineId){
       let text='';
       if(it.id.startsWith('reply:')){text=it._replyContent||'';}
       else{const p=posts.find(x=>x.id===it.id);text=p?cleanText(p.content):'（削除済み）';}
-      if(!text.trim())return'';
+      // 空行も表示（バレットなし）
       const lines=text.split('\n').filter(l=>l.trim());
       return`<div style="padding:3px 0 3px ${lvl*20}px;display:flex;align-items:baseline;gap:6px;line-height:1.75;">
         <span style="color:var(--accent-m);flex-shrink:0;">・</span>
@@ -3813,7 +4141,7 @@ function exportCardText(fmt='txt'){
     const items=ol.items.map(it=>{
       let text=it.text||'';
       if(!text&&it.id&&!it.id.startsWith('reply:')){const p=posts.find(x=>x.id===it.id);text=p?cleanText(p.content):'';}
-      if(!text.trim())return'';
+      // 空行も表示（バレットなし）
       return`${'  '.repeat(it.level||0)}- ${text.replace(/\n/g,' ')}`;
     }).filter(Boolean).join('\n');
     const md=`# ${ol.title||'無題'}\n\n${items}\n`;
@@ -3823,7 +4151,7 @@ function exportCardText(fmt='txt'){
     const lines=(ol.title||'無題')+'\n\n'+ol.items.map(it=>{
       let text=it.text||'';
       if(!text&&it.id&&!it.id.startsWith('reply:')){const p=posts.find(x=>x.id===it.id);text=p?cleanText(p.content):'';}
-      if(!text.trim())return'';
+      // 空行も表示（バレットなし）
       return'\t'.repeat(it.level||0)+text;
     }).filter(Boolean).join('\n');
     dl(new Blob([lines],{type:'text/plain;charset=utf-8'}),name+'.txt');
@@ -3869,7 +4197,7 @@ function renderScrapGrid11(){
       ${sc.scrapDescription?`<div class="card-cell-body" style="font-size:11px;-webkit-line-clamp:2;">${esc(sc.scrapDescription)}</div>`:''}
       <div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;align-items:center;">
         <span class="source-badge" style="color:#4a7a52;background:#e4f0e4;border-color:#b8d4b8;">✂️${hl.length?` ${hl.length}件`:''}</span>
-        ${(sc.labels||[]).map(l=>`<span style="font-size:9px;padding:1px 6px;border-radius:20px;background:var(--accent);color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('')}
+        ${(sc.labels||[]).map(l=>`<span style="font-size:7px;padding:1px 6px;border-radius:20px;background:#2c4a7c;color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('')}
       </div>
       <div class="card-cell-foot">${fmtDate(sc.createdAt)}</div>
       <div class="card-cell-fade" style="background:linear-gradient(transparent,#f4f8f4)"></div>
@@ -3921,7 +4249,7 @@ function renderObjectGrid(){
         <div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;align-items:center;">
           <span class="source-badge">📎${subs.length?` ${subs.length}件`:''}</span>
           ${quotes.length?`<span class="source-badge">💬 ${quotes.length}件</span>`:''}
-          ${(ol.labels||[]).map(l=>`<span style="font-size:9px;padding:1px 6px;border-radius:20px;background:var(--accent);color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('')}
+          ${(ol.labels||[]).map(l=>`<span style="font-size:7px;padding:1px 6px;border-radius:20px;background:#2c4a7c;color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('')}
         </div>
         <div class="card-cell-foot">${fmtDate(ol.updatedAt)}</div>
         <div class="card-cell-fade" style="background:linear-gradient(transparent,var(--source-l))"></div>
@@ -3935,7 +4263,7 @@ function renderObjectGrid(){
         <div class="card-cell-body" style="flex:1;font-size:11px;">${esc((ol.scrapDescription||ol.scrapSnippet||'').slice(0,80))}</div>
         <div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;align-items:center;">
           <span class="source-badge" style="color:#4a7a52;background:#e4f0e4;border-color:#b8d4b8;">✂️${ol.scrapHighlights?.length?` ${ol.scrapHighlights.length}件`:''}</span>
-          ${(ol.labels||[]).map(l=>`<span style="font-size:9px;padding:1px 6px;border-radius:20px;background:var(--accent);color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('')}
+          ${(ol.labels||[]).map(l=>`<span style="font-size:7px;padding:1px 6px;border-radius:20px;background:#2c4a7c;color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('')}
         </div>
         <div class="card-cell-foot">${fmtDate(ol.createdAt)}</div>
         <div class="card-cell-fade" style="background:linear-gradient(transparent,#f4f8f4)"></div>
@@ -3978,24 +4306,32 @@ function renderObjectRelated(ol){
   if(!hasContent){related.style.display='none';return;}
   related.style.display='flex';
 
-  const ts='border:0.5px solid var(--border);border-radius:6px;padding:6px 8px;cursor:pointer;transition:background .12s;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;gap:2px;height:72px;box-sizing:border-box;';
+  const ts='border-radius:6px;padding:6px 8px;cursor:pointer;transition:background .12s;overflow:hidden;flex-shrink:0;display:flex;flex-direction:column;gap:2px;height:72px;box-sizing:border-box;';
   const tts="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;font-weight:600;line-height:1.4;word-break:break-all;";
   const ms="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;";
 
-  function cardThumb(card, accent, bg){
-    const preview=(card.items||[]).slice(0,3).map(it=>it.text||'').filter(Boolean).join('  ').slice(0,50);
-    return`<div style="${ts}background:${bg||'var(--bg2)'};border-left:2px solid ${accent||'var(--border)'};" onclick="openCardDetail('${card.id}')" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='${bg||'var(--bg2)'}'">
-      <div style="${tts}color:${accent||'var(--text)'};">${esc(card.title||'無題')}</div>
-      <div style="${ms}">${esc(preview)}</div>
+  function cardThumb(card){
+    const tc=getCardTypeColor(card.cardType);
+    const lbHtml=(card.labels||[]).map(l=>`<span style="font-size:7px;color:#6b88b8;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join(' ');
+    return`<div style="${ts}background:var(--bg2);border:0.5px solid var(--border);border-left:2px solid ${tc};" onclick="openCardDetail('${card.id}')" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--bg2)'">
+      <div style="${tts}color:var(--text);">${esc(card.title||'無題')}</div>
+      ${lbHtml?`<div style="margin-top:2px;">${lbHtml}</div>`:''}
     </div>`;
   }
 
   function hd(label){return`<div class="card-related-hd">${label}</div>`;}
 
   let html='';
-  if(linkedCards.length) html+=hd(`🔗 リンク先（${linkedCards.length}）`)+linkedCards.map(c=>cardThumb(c,'var(--accent-d)','var(--bg2)')).join('');
-  if(backlinks.length)   html+=hd(`↩ バックリンク（${backlinks.length}）`)+backlinks.map(c=>cardThumb(c,'var(--teal)','#f0fbfb')).join('');
-  if(sameLabel.length){html+=hd(`🏷 同じラベル（${sameLabel.length}）`);html+=sameLabel.map(c=>{const ml=(c.labels||[]).filter(l=>labels.includes(l));const lbHtml=ml.map(l=>`<span style="font-size:8px;padding:1px 5px;border-radius:20px;background:var(--accent);color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;flex-shrink:0;">${esc(l)}</span>`).join('');return`<div style="${ts}background:var(--bg2);border-left:2px solid var(--accent-m);" onclick="openCardDetail('${c.id}')" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='var(--bg2)'"><div style="${tts}color:var(--accent-d);">${esc(c.title||'無題')}</div><div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:2px;">${lbHtml}</div></div>`;}).join('');}
+  if(linkedCards.length) html+=hd(`🔗 リンク先（${linkedCards.length}）`)+linkedCards.map(c=>cardThumb(c)).join('');
+  if(backlinks.length)   html+=hd(`↩ バックリンク（${backlinks.length}）`)+backlinks.map(c=>cardThumb(c)).join('');
+  if(sameLabel.length){
+    const hdId='sameLabelHd_'+ol.id;
+    const bodyId='sameLabelBody_'+ol.id;
+    html+=`<div class="card-related-hd" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="const b=document.getElementById('${bodyId}');const a=this.querySelector('.sl-arrow');b.style.display=b.style.display==='none'?'block':'none';a.textContent=b.style.display==='none'?'▸':'▾';">
+      <span>🏷 同じラベル（${sameLabel.length}）</span><span class="sl-arrow" style="font-size:9px;">▸</span>
+    </div>`;
+    html+=`<div id="${bodyId}" style="display:none;">${sameLabel.map(c=>cardThumb(c)).join('')}</div>`;
+  }
   if(refMedia.length){
     html+=hd('📎 参照メディア');
     html+=refMedia.map(m=>{
@@ -4168,7 +4504,7 @@ function renderScrapGrid(){
       </div>
       <div style="display:flex;gap:4px;align-items:center;padding:0 10px 8px;flex-shrink:0;flex-wrap:wrap;">
         <span class="scrap-badge">✂️ スクラップ${hl.length?` · ${hl.length}件`:''}</span>
-        ${(sc.labels||[]).map(l=>`<span style="font-size:9px;padding:1px 7px;border-radius:20px;background:var(--accent);color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('')}
+        ${(sc.labels||[]).map(l=>`<span style="font-size:7px;padding:1px 7px;border-radius:20px;background:#2c4a7c;color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('')}
       </div>
       <div class="card-cell-foot" style="padding:0 10px 8px;">${fmtDate(sc.createdAt)}</div>
     </div>`;
@@ -6824,21 +7160,22 @@ function wfDelete(){
 
 // タイムラインから選択してアウトラインに追加（互換）
 function goToOutlineWithSel(){
-  // 選択投稿をWorkFlowyアウトラインに変換
   if(!selectedIds.size){switchPhase(3);return;}
-  wfNewOutline();
-  const ol=wfGetOl();if(!ol)return;
-  ol.items=[];
+  // 選択投稿からカードを作成
+  const firstPost=posts.find(x=>selectedIds.has(x.id));
+  const title=firstPost?cleanText(firstPost.content).split('\n')[0].slice(0,30):'新しいカード';
+  const items=[];
   selectedIds.forEach(id=>{
-    const p=posts.find(x=>x.id===id);
-    if(!p)return;
-    ol.items.push({id:uid(),text:cleanText(p.content),level:0});
-    (p.replies||[]).forEach(r=>{
-      ol.items.push({id:uid(),text:cleanText(r.content),level:1});
-    });
+    const p=posts.find(x=>x.id===id);if(!p)return;
+    items.push({id:uid(),text:cleanText(p.content),level:0});
+    (p.replies||[]).forEach(r=>items.push({id:uid(),text:cleanText(r.content),level:1}));
   });
-  if(!ol.items.length)ol.items=[{id:uid(),text:'',level:0}];
-  selectedIds.clear();save();wfRenderItems();wfRenderSidebar();
+  const newOl={id:uid(),title,items:items.length?items:[{id:uid(),text:'',level:0}],
+    images:[],labels:[],createdAt:Date.now(),updatedAt:Date.now()};
+  outlines.unshift(newOl);
+  selectedIds.clear();save();
+  switchPhase(3);
+  setTimeout(()=>openCardDetail(newOl.id),100);
 }
 
 // ノートタブから呼ばれる goToNote（互換）：現在のアウトラインをノートに変換
@@ -6884,16 +7221,6 @@ function newOutline(){
   renderAllPostsPanel();renderOutlineFeed();renderSavedOutlinesBar();
 }
 
-function goToOutlineWithSel(){
-  // 選択中の投稿をアウトラインに追加（連ツイは構造ごと）
-  selectedIds.forEach(id=>{
-    if(!currentOutline.find(it=>it.id===id)){
-      addThreadToOutline(id,0);
-    }
-  });
-  selectedIds.clear();
-  switchPhase(4);
-}
 
 // 投稿（＋連ツイ）をアウトラインに追加するヘルパー
 function addThreadToOutline(pid,baseLevel){
@@ -7383,17 +7710,16 @@ function openReadWriteMode(){
       const lvl=it.level||0;
       let text=it.text||'';
       if(!it.text&&it.id&&!it.id.startsWith('reply:')){const p=posts.find(x=>x.id===it.id);text=p?cleanText(p.content):'';}
-      if(!text.trim())return'';
+      // 空行も表示（バレットなし）
       return`<div style="display:flex;gap:8px;padding:3px 0 3px ${lvl*20}px;line-height:1.75;">
         <span style="color:var(--text3);flex-shrink:0;font-size:12px;">•</span>
         <span style="font-size:12px;color:var(--text);white-space:pre-wrap;word-break:break-word;">${linkifyCard(esc(text))}</span>
       </div>`;
     }).filter(Boolean).join('');
-    const lbHtml=(ol.labels||[]).map(l=>`<span style="font-size:9px;padding:1px 7px;border-radius:20px;background:var(--accent);color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('');
+    const lbHtml=(ol.labels||[]).map(l=>`<span style="font-size:7px;padding:1px 7px;border-radius:20px;background:#2c4a7c;color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('');
     return`<div style="margin-bottom:0.5rem;padding:1rem 1.3rem;background:var(--bg2);border-radius:var(--rsm);border:0.5px solid var(--border);">
       <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;" onclick="closeReadWriteMode();openCardDetail('${ol.id}')">${esc(ol.title||'無題')}</div>
       ${lbHtml?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">${lbHtml}</div>`:''}
-      <div style="border-top:0.5px solid var(--border);margin-bottom:10px;"></div>
       ${items||'<div style="color:var(--text3);font-size:12px;">（項目なし）</div>'}
     </div>`;
   }).join('');
@@ -7974,6 +8300,7 @@ if(window.innerWidth<=640){
 }
 
 
+
 </script>
 <!-- ── カード詳細（グローバルオーバーレイ） ── -->
 <div class="card-detail" id="cardDetail" style="display:none;">
@@ -8046,7 +8373,6 @@ if(window.innerWidth<=640){
           onfocus="this.style.borderBottomColor='var(--border2)'"
           onblur="this.style.borderBottomColor='transparent'"
           data-placeholder="カードのタイトル" onkeydown="if(event.key==='Enter'){event.preventDefault();document.querySelector('#rwItems [contenteditable]')?.focus();}"></div>
-        <div style="border-top:0.5px solid var(--border);margin:2px 0;"></div>
         <div id="rwItems" style="flex:1;"></div>
         <button onclick="rwAddItem()" style="padding:4px 10px;background:none;border:0.5px dashed var(--border2);border-radius:var(--rsm);font-size:11px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;color:var(--text3);cursor:pointer;text-align:left;align-self:flex-start;">＋ 項目を追加</button>
       </div>

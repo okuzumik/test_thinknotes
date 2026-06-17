@@ -1128,8 +1128,7 @@ body.card-select-mode .card-cb-row input[type="checkbox"] { display:inline-block
       <div class="nav-group-label">カードで束ねる・集める</div>
       <div class="nav-group-tabs">
         <button class="phase-step" id="ps-5" onclick="switchPhase(5)">カード</button>
-        <button class="phase-step" id="ps-10" onclick="switchPhase(10)">メディア</button>
-        <button class="phase-step" id="ps-11" onclick="switchPhase(11)">スクラップ</button>
+        <button class="phase-step" id="ps-5b" onclick="switchToBinderTab()" style="font-size:10px;">バインダー</button>
       </div>
     </div>
     <div class="nav-divider"></div>
@@ -1211,7 +1210,7 @@ body.card-select-mode .card-cb-row input[type="checkbox"] { display:inline-block
         <div class="compose-footer">
           <div style="display:flex;align-items:center;gap:6px;flex:1;">
             <button class="img-attach-btn" onclick="openImagePicker()" title="画像を追加">🖼️</button>
-            <button class="img-attach-btn" onclick="openSourcePicker()" title="ソースを引用" style="font-size:13px;">📎</button>
+            <button class="img-attach-btn" onclick="openSourcePicker()" title="カードに言及" style="font-size:13px;">📎</button>
             <input type="file" id="imageInput" accept="image/*" multiple style="display:none" onchange="onImageSelected(event)">
             <div class="compose-hint">Ctrl+Enter で投稿　<span>#タグ</span> は後から追加・削除できます</div>
             <button onclick="toggleQuoteTag()" id="quoteTagBtn" title="#引用タグを付けて引用スタイルで投稿" style="padding:3px 10px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-size:11px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;color:var(--text3);cursor:pointer;">❝ 引用</button>
@@ -1441,17 +1440,16 @@ body.card-select-mode .card-cb-row input[type="checkbox"] { display:inline-block
   </div>
 
   <!-- ═══ PHASE 5 — CARD GRID ═══ -->
+  <div class="phase-screen" id="phase5b" style="display:none;flex-direction:column;">
+    <div style="padding:8px 16px;border-bottom:0.5px solid var(--border);background:var(--bg3);font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:12px;font-weight:600;color:var(--text2);">保存済みの束</div>
+    <div id="binderTabContent" style="flex:1;overflow-y:auto;"></div>
+  </div>
+
   <div class="phase-screen" id="phase5">
     <!-- カードグリッド -->
     <div class="card-grid-wrap" id="cardGridWrap">
       <div class="card-grid-toolbar">
         <input class="card-grid-search" id="cardGridSearch" placeholder="カードを検索…" oninput="renderCardGrid()">
-        <!-- コンパクトフィルターボタン -->
-        <div style="position:relative;flex-shrink:0;">
-          <button id="cardFilterBtn" onclick="toggleCardFilterPanel()" style="padding:4px 11px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
-            <span>絞り込み</span><span id="cardFilterCount" style="display:none;font-size:9px;background:#2c4a7c;color:#fff;border-radius:20px;padding:1px 5px;"></span><span id="cardFilterArrow">▾</span>
-          </button>
-        </div>
         <span class="card-grid-count" id="cardGridCount"></span>
         <button id="cardSelectModeBtn" onclick="toggleCardSelectMode()" style="padding:5px 12px;background:none;color:var(--text2);border:0.5px solid var(--border2);border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;white-space:nowrap;flex-shrink:0;">複数カードを選択</button>
         <button onclick="newCardFromOutliner()" style="padding:5px 14px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">＋ 新規作成</button>
@@ -1460,13 +1458,15 @@ body.card-select-mode .card-cb-row input[type="checkbox"] { display:inline-block
       <div id="cardSelBar" style="display:none;">
         <span id="cardSelLabel" style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:13px;color:var(--accent-d);font-weight:600;"></span>
         <button onclick="cardSelClear()" style="padding:3px 10px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;color:var(--text2);cursor:pointer;">選択解除</button>
-        <button onclick="openReadWriteMode()" style="padding:5px 14px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:12px;font-weight:700;cursor:pointer;">複数カードを全文表示</button>
-        <button onclick="createNoteFromCards()" style="padding:5px 16px;background:#2d6a4f;color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-left:auto;">📝 このカードでノートを作成 →</button>
+        <button onclick="openReadWriteMode('vertical')" style="padding:4px 12px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;">縦に並べる</button>
+        <button onclick="openReadWriteMode('horizontal')" style="padding:4px 12px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;">横に並べる</button>
+        <button onclick="openBinderMode()" style="padding:4px 12px;background:#5a6a8a;color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;">束ねる</button>
+        <button onclick="createNoteFromCards()" style="padding:4px 12px;background:#2d6a4f;color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;margin-left:auto;">📝 ノートに連結</button>
       </div>
       <!-- メインエリア: フィルターサイドバー + カードグリッド -->
       <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
         <!-- 左：フィルターパネル -->
-        <div id="cardFilterSidebar" style="display:none;width:180px;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg3);overflow-y:auto;padding:12px 14px;">
+        <div id="cardFilterSidebar" style="width:180px;flex-shrink:0;border-right:0.5px solid var(--border);background:var(--bg3);overflow-y:auto;padding:12px 14px;">
           <div id="cardFilterPanelContent"></div>
         </div>
         <!-- 右：カードグリッド -->
@@ -1688,6 +1688,25 @@ body.card-select-mode .card-cb-row input[type="checkbox"] { display:inline-block
   </div>
 </div>
 
+<!-- カードにつぶやきを追加するピッカー -->
+<div id="cardPostPickerModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.5);align-items:center;justify-content:center;">
+  <div style="background:var(--bg2);border-radius:var(--r);width:min(680px,96vw);max-height:86vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.2);">
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:0.5px solid var(--border);flex-shrink:0;">
+      <span style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:14px;font-weight:700;color:var(--text);flex:1;">💬 つぶやきを選んでカードに追加</span>
+      <span id="cardPostPickerCount" style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:12px;color:var(--accent);"></span>
+      <button onclick="closeCardPostPicker()" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text3);">✕</button>
+    </div>
+    <div style="padding:8px 14px;border-bottom:0.5px solid var(--border);flex-shrink:0;">
+      <input id="cardPostPickerSearch" placeholder="つぶやきを検索…" oninput="renderCardPostPicker()" style="width:100%;padding:6px 12px;border:0.5px solid var(--border2);border-radius:20px;font-size:13px;font-family:inherit;color:var(--text);background:var(--bg3);outline:none;">
+    </div>
+    <div id="cardPostPickerList" style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;overflow-y:auto;flex:1;"></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-top:0.5px solid var(--border);flex-shrink:0;background:var(--bg3);">
+      <button onclick="closeCardPostPicker()" style="padding:6px 16px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:13px;color:var(--text2);cursor:pointer;">キャンセル</button>
+      <button onclick="confirmCardPostPicker()" style="padding:6px 20px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-left:auto;">＋ カードに追加</button>
+    </div>
+  </div>
+</div>
+
 <!-- 画像ライブラリモーダル -->
 <div id="imgLibraryModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);align-items:center;justify-content:center;">
   <div style="background:var(--bg2);border-radius:var(--r);width:min(680px,96vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.2);">
@@ -1721,8 +1740,8 @@ body.card-select-mode .card-cb-row input[type="checkbox"] { display:inline-block
 <div class="source-picker-modal" id="sourcePickerModal" onclick="if(event.target===this)closeSourcePicker()">
   <div class="source-picker-box">
     <div class="source-picker-head">
-      <span class="source-picker-title">📎 オブジェクトを選択</span>
-      <input class="source-picker-search" id="sourcePickerSearch" placeholder="媒体・スクラップを検索…" oninput="_editingSourceForPostId?renderSourcePickerListForEdit():renderSourcePickerList()">
+      <span class="source-picker-title">📎 言及するカードを選択</span>
+      <input class="source-picker-search" id="sourcePickerSearch" placeholder="カードを検索…" oninput="_editingSourceForPostId?renderSourcePickerListForEdit():renderSourcePickerList()">
       <button onclick="closeSourcePicker()" style="background:none;border:none;font-size:20px;color:var(--text3);cursor:pointer;padding:0 4px;">✕</button>
     </div>
     <div class="source-picker-list" id="sourcePickerList"></div>
@@ -1866,6 +1885,7 @@ async function loadFromSupabase(force=false){
     if(error)throw error;
     const map={};(data||[]).forEach(r=>{map[r.data_key]=r.data_value;});
     const sbPosts=map.posts||[];
+    _cloudCount={posts:sbPosts.length,outlines:(map.outlines||[]).length};
 
     if(!sbPosts.length){
       // Supabaseが空→ローカルをアップロード
@@ -1873,16 +1893,22 @@ async function loadFromSupabase(force=false){
       setSyncDot('saved');return;
     }
 
-    // 最新投稿のcreatedAtで比較
-    const latestLocal=localPosts.length
-      ?Math.max(...localPosts.map(p=>p.createdAt||0)):0;
-    const latestSb=Math.max(...sbPosts.map(p=>p.createdAt||0));
+    // 最新投稿のcreatedAt + outlinesのupdatedAtで比較
+    const latestLocal=Math.max(
+      localPosts.length?Math.max(...localPosts.map(p=>p.createdAt||0)):0,
+      localOutlines.length?Math.max(...localOutlines.map(o=>o.updatedAt||o.createdAt||0)):0
+    );
+    const sbOutlines=map.outlines||[];
+    const latestSb=Math.max(
+      sbPosts.length?Math.max(...sbPosts.map(p=>p.createdAt||0)):0,
+      sbOutlines.length?Math.max(...sbOutlines.map(o=>o.updatedAt||o.createdAt||0)):0
+    );
 
     console.log(`📊 ローカル最新: ${new Date(latestLocal).toLocaleString()}`);
     console.log(`📊 Supabase最新: ${new Date(latestSb).toLocaleString()}`);
 
-    if(latestSb>latestLocal){
-      // Supabaseが新しい→採用
+    if(latestSb>latestLocal&&!_skipNextSync){
+      // Supabaseが新しい→採用（復元直後はスキップ）
       console.log('✅ Supabaseを採用');
       posts=sbPosts;notes=map.notes||[];outlines=map.outlines||[];
       posts.forEach(p=>{if(!p.replies)p.replies=[];});
@@ -2162,9 +2188,34 @@ async function forceSyncFromSupabase(){
 
 let lastSaveOk=true; // 最後の保存が成功したか
 
+// 既知のクラウド件数（安全弁用）。load/save時に更新
+let _cloudCount={posts:null,outlines:null};
 async function saveToSupabase(){
   if(!currentUser)return;
   if(!posts.length&&!notes.length){console.warn('saveToSupabase: 空データスキップ');return;}
+  // ── 安全弁: クラウドより大幅に件数が減る上書きは確認する ──
+  if(_cloudCount.posts!=null&&(posts.length<_cloudCount.posts-5||outlines.length<(_cloudCount.outlines??0)-3)){
+    let cloudPosts=_cloudCount.posts,cloudOutlines=_cloudCount.outlines??0;
+    try{
+      const {data:cur}=await sb.from('thinkdata').select('data_key,data_value')
+        .eq('user_id',currentUser.id).in('data_key',['posts','outlines']);
+      const cmap={};(cur||[]).forEach(r=>{cmap[r.data_key]=r.data_value;});
+      cloudPosts=(cmap.posts||[]).length;cloudOutlines=(cmap.outlines||[]).length;
+    }catch(e){/* 取得失敗時はキャッシュ値で判定 */}
+    if(posts.length<cloudPosts-5||outlines.length<cloudOutlines-3){
+      const ok=confirm('⚠️ データ消失の可能性があります\n\n'
+        +'クラウド: 投稿'+cloudPosts+'件 / カード'+cloudOutlines+'件\n'
+        +'今回の上書き: 投稿'+posts.length+'件 / カード'+outlines.length+'件\n\n'
+        +'件数が大きく減っています。この内容でクラウドを上書きしますか？\n'
+        +'キャンセルするとアップロードを中止し、クラウドのデータを保持します。');
+      if(!ok){
+        _cloudCount={posts:cloudPosts,outlines:cloudOutlines};
+        setSyncDot('');
+        console.warn('saveToSupabase: 縮小上書きをユーザーがキャンセル');
+        return;
+      }
+    }
+  }
   setSyncDot('syncing');
   const uid=currentUser.id,ts=new Date().toISOString();
   const stripped=posts.map(p=>({...p,
@@ -2180,6 +2231,7 @@ async function saveToSupabase(){
     const {error}=await sb.from('thinkdata').upsert(rows,{onConflict:'user_id,data_key'});
     if(error)throw error;
     lastSaveOk=true;_lastSaveTime=Date.now();
+    _cloudCount={posts:posts.length,outlines:outlines.length};
     setSyncDot('saved');
     console.log('✅ 保存完了 投稿'+posts.length+'件');
   }catch(e){
@@ -2477,9 +2529,64 @@ async function createCardFromPost(postId){
   outlines.unshift(newOl);
   save();
 
-  // カードタブを開いてそのカードを表示
-  switchPhase(3);
+  // カードタブ（カード一覧）を開いてそのカードを表示
+  switchPhase(5);
   setTimeout(()=>openCardDetail(newOl.id),100);
+}
+
+// ─── カードにタイムラインのつぶやきを選んで追加 ───
+const cardPostPickerSel=new Set();
+function openCardPostPicker(){
+  if(!currentCardOutlineId)return;
+  cardPostPickerSel.clear();
+  const s=document.getElementById('cardPostPickerSearch');if(s)s.value='';
+  renderCardPostPicker();
+  document.getElementById('cardPostPickerModal').style.display='flex';
+}
+function closeCardPostPicker(){
+  const m=document.getElementById('cardPostPickerModal');if(m)m.style.display='none';
+}
+function renderCardPostPicker(){
+  const q=(document.getElementById('cardPostPickerSearch')?.value||'').toLowerCase();
+  let pool=[...posts].sort((a,b)=>b.createdAt-a.createdAt);
+  if(q)pool=pool.filter(p=>(p.content||'').toLowerCase().includes(q));
+  const list=document.getElementById('cardPostPickerList');if(!list)return;
+  const count=document.getElementById('cardPostPickerCount');
+  if(count)count.textContent=cardPostPickerSel.size?`${cardPostPickerSel.size}件選択中`:'';
+  if(!pool.length){list.innerHTML=`<div style="padding:2rem;text-align:center;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:13px;color:var(--text3);">つぶやきがありません</div>`;return;}
+  list.innerHTML=pool.map(p=>{
+    const sel=cardPostPickerSel.has(p.id);
+    const selIdx=sel?[...cardPostPickerSel].indexOf(p.id)+1:0;
+    const replies=p.replies||[];
+    return`<div onclick="cardPostPickerToggle('${p.id}')"
+      style="background:${sel?'var(--accent-l)':'var(--bg3)'};border:${sel?'1.5px solid var(--accent)':'0.5px solid var(--border)'};border-radius:8px;padding:10px 12px;cursor:pointer;position:relative;display:flex;flex-direction:column;gap:4px;transition:all .12s;">
+      ${sel?`<div style="position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;">${selIdx}</div>`:''}
+      <div style="font-size:13px;color:var(--text);white-space:pre-wrap;word-break:break-word;padding-right:${sel?'24px':'0'};">${esc(cleanText(p.content).slice(0,140))}</div>
+      <div style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:10px;color:var(--text3);">${fmtDt(p.createdAt)}${replies.length?` · ↩ 連ツイ${replies.length}件`:''}</div>
+    </div>`;
+  }).join('');
+}
+function cardPostPickerToggle(id){
+  if(cardPostPickerSel.has(id))cardPostPickerSel.delete(id);
+  else cardPostPickerSel.add(id);
+  renderCardPostPicker();
+}
+function confirmCardPostPicker(){
+  if(!cardPostPickerSel.size)return;
+  const ol=outlines.find(x=>x.id===currentCardOutlineId);if(!ol)return;
+  if(!ol.items)ol.items=[];
+  [...cardPostPickerSel].forEach(pid=>{
+    const p=posts.find(x=>x.id===pid);if(!p)return;
+    const mainText=cleanText(p.content);
+    if(mainText.trim())ol.items.push({id:uid(),text:mainText,level:0});
+    (p.replies||[]).forEach(r=>{
+      const rt=cleanText(r.content);
+      if(rt.trim())ol.items.push({id:uid(),text:rt,level:1});
+    });
+  });
+  ol.updatedAt=Date.now();save();
+  closeCardPostPicker();
+  openCardDetail(ol.id);
 }
 
 async function postToBsky(text, replyRef=null, imageUrls=[], originalFiles=[]){
@@ -3147,6 +3254,7 @@ function renderCardView(){
   closeCardDetail();
   renderCardLabelFilters();
   renderCardGrid();
+  renderCardFilterPanelContent();
 }
 
 let _cardGridPool=[];
@@ -3164,6 +3272,9 @@ function getCardTypeColor(type){
     '引用':      '#744210',
     '構造':      '#2c5282',
     '反論':      '#9b2335',
+    'メディア':  '#0e7490',
+    'スクラップ':'#4d7c0f',
+    '問い':      '#7c3aed',
   };
   return map[type]||'#6b7280';
 }
@@ -3201,7 +3312,179 @@ function saveCardType(val){
 
 
 
+// ── バインダー ──────────────────────────────
+let _binderCardIds=[];
+
+function toggleBinderEditor(){
+  const pane=document.getElementById('binderEditorPane');
+  const btn=document.getElementById('binderEditorBtn');
+  if(!pane)return;
+  const open=pane.style.display!=='none';
+  pane.style.display=open?'none':'flex';
+  if(btn)btn.textContent=open?'＋ 新しいカードを作成':'✕ エディタを閉じる';
+  if(!open){
+    document.getElementById('binderNewTitle').textContent='新しいカード';
+    document.getElementById('binderNewItems').innerHTML='<div contenteditable="true" style="outline:none;min-height:24px;font-size:13px;color:var(--text2);padding:2px 0;"></div>';
+    document.getElementById('binderNewTitle').focus();
+  }
+}
+
+function saveBinderNewCard(){
+  const title=(document.getElementById('binderNewTitle')?.textContent||'').trim()||'新しいカード';
+  const itemDivs=document.querySelectorAll('#binderNewItems [contenteditable]');
+  const items=[...itemDivs].map(d=>({id:uid(),text:d.textContent.trim()||'',level:0})).filter(it=>it.text);
+  if(!items.length)items.push({id:uid(),text:'',level:0});
+  const newOl={id:uid(),title,items,images:[],labels:[],createdAt:Date.now(),updatedAt:Date.now()};
+  outlines.unshift(newOl);
+  // 束に追加
+  _binderCardIds.unshift(newOl.id);
+  save();
+  // サムネ一覧を更新
+  const cards=_binderCardIds.map(id=>outlines.find(x=>x.id===id)).filter(Boolean);
+  renderBinderThumbList(cards);
+  showBinderCard(newOl.id);
+  toggleBinderEditor();
+}
+
+function openBinderMode(){
+  if(!selectedCardIds.size)return;
+  _binderCardIds=[...selectedCardIds];
+  const cards=_binderCardIds.map(id=>outlines.find(x=>x.id===id)).filter(Boolean);
+  if(!cards.length)return;
+  document.getElementById('binderLabel').textContent=cards.length+'件のカード';
+  document.getElementById('binderNameInput').value='';
+  renderBinderThumbList(cards);
+  // 最初のカードを右ペインに表示
+  if(cards[0])showBinderCard(cards[0].id);
+  document.getElementById('binderOverlay').style.display='flex';
+}
+
+function renderBinderThumbList(cards){
+  const list=document.getElementById('binderThumbList');
+  if(!list)return;
+  list.innerHTML=cards.map(ol=>{
+    const tc=getCardTypeColor(ol.cardType);
+    const tcStyle=ol.cardType?'box-shadow:0 2px 6px rgba(0,0,0,.08);':'';
+    const labels=(ol.labels||[]).map(l=>'<span style="font-size:8px;color:#6b88b8;font-weight:600;">'+esc(l)+'</span>').join(' ');
+    const preview=(ol.items||[]).slice(0,3).map(it=>it.text||'').filter(Boolean).join(' ').slice(0,60);
+    const hasImg=ol.images&&ol.images[0];
+    return`<div id="bthumb_${ol.id}" onclick="showBinderCard('${ol.id}')"
+      style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rsm);
+      padding:8px;cursor:pointer;margin-bottom:6px;${tcStyle}display:flex;flex-direction:column;gap:3px;user-select:none;height:188px;overflow:hidden;">
+      <div style="font-size:11px;font-weight:700;color:#333;line-height:1.35;">${esc(ol.title||'無題')}</div>
+      <div style="height:1.5px;background:${tc};border-radius:1px;opacity:${ol.cardType?1:0};"></div>
+      ${hasImg
+        ?`<img src="${esc(ol.images[0])}" style="width:100%;max-height:60px;object-fit:contain;border-radius:3px;background:var(--bg3);" loading="lazy">`
+        :`<div style="font-size:10px;color:var(--text2);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">${esc(preview)}</div>`}
+      ${labels?`<div style="display:flex;flex-wrap:wrap;gap:2px;">${labels}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function showBinderCard(id){
+  const ol=outlines.find(x=>x.id===id);if(!ol)return;
+  document.querySelectorAll('#binderThumbList > div').forEach(d=>{d.style.outline='none';d.style.background='var(--bg2)';});
+  const el=document.getElementById('bthumb_'+id);
+  if(el){el.style.background='var(--bg3)';el.style.outline='2px solid var(--teal)';}
+  const view=document.getElementById('binderCardView');if(!view)return;
+  const tc=getCardTypeColor(ol.cardType);
+  const labels=(ol.labels||[]).map(lb=>'<span class="card-label-tag" style="cursor:default;">'+esc(lb)+'</span>').join('');
+  const items=(ol.items||[]).map(it=>{
+    const lvl=it.level||0; const text=it.text||'';
+    return'<div style="display:flex;align-items:baseline;gap:6px;padding:2px 0;padding-left:'+(lvl*22)+'px;">'
+      +'<span style="color:var(--accent-m);flex-shrink:0;font-size:12px;visibility:'+(text?'visible':'hidden')+';">•</span>'
+      +'<span style="font-size:13px;white-space:pre-wrap;word-break:break-word;">'+linkifyCard(text)+'</span>'
+      +'</div>';
+  }).join('');
+  const imgHtml=(ol.images||[]).map(src=>'<img src="'+esc(src)+'" class="card-detail-card-image" style="margin-top:6px;cursor:pointer;" onclick="openLightbox(\''+src+'\')" loading="lazy">').join('');
+  view.innerHTML='<div class="card-detail-card" style="max-width:720px;margin:0 auto;">'
+    +'<div class="card-detail-card-title" style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:6px;">'+esc(ol.title||'無題')+'</div>'
+    +'<div style="height:2px;background:'+tc+';border-radius:1px;margin-bottom:10px;opacity:'+(ol.cardType?1:0)+';"></div>'
+    +(labels?'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">'+labels+'</div>':'')
+    +'<div>'+items+'</div>'
+    +imgHtml
+    +'</div>';
+}
+
+
+function saveBinder(){
+  const name=document.getElementById('binderNameInput').value.trim();
+  if(!name)return alert('束の名前を入力してください');
+  const b={id:uid(),name,cardIds:[..._binderCardIds],createdAt:Date.now(),updatedAt:Date.now()};
+  binders.unshift(b);bindersSave();
+  renderBinderTab();
+  alert('「'+name+'」として保存しました');
+}
+
+function closeBinderMode(){
+  document.getElementById('binderOverlay').style.display='none';
+}
+
+function renderBinderTab(){
+  const el=document.getElementById('binderTabContent');if(!el)return;
+  if(!binders.length){el.innerHTML='<div style="padding:2rem;color:var(--text3);text-align:center;font-family:\'Hiragino Kaku Gothic ProN\',sans-serif;">保存済みの束がありません</div>';return;}
+  el.innerHTML=binders.map(b=>{
+    const cards=b.cardIds.map(id=>outlines.find(x=>x.id===id)).filter(Boolean);
+    return`<div style="margin:8px 12px;padding:10px 14px;background:var(--bg2);border-radius:var(--rsm);border:0.5px solid var(--border);">
+      <div id="binderView_${b.id}" style="display:flex;align-items:center;gap:8px;">
+        <div onclick="openSavedBinder('${b.id}')" style="flex:1;cursor:pointer;">
+          <div style="font-size:13px;font-weight:700;color:var(--text);">${esc(b.name)}</div>
+          <div style="font-size:10px;color:var(--text3);">${cards.length}件 · ${new Date(b.createdAt).toLocaleDateString('ja')}</div>
+        </div>
+        <button onclick="binderStartRename('${b.id}')" style="padding:2px 8px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-size:10px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;color:var(--text2);cursor:pointer;">名前変更</button>
+        <button onclick="deleteBinder('${b.id}')" style="padding:2px 8px;background:none;border:0.5px solid var(--red);border-radius:20px;font-size:10px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;color:var(--red);cursor:pointer;">削除</button>
+      </div>
+      <div id="binderEdit_${b.id}" style="display:none;gap:6px;align-items:center;margin-top:6px;">
+        <input id="binderRenameInput_${b.id}" value="${esc(b.name)}" style="flex:1;padding:4px 8px;border:0.5px solid var(--border2);border-radius:var(--rsm);font-size:12px;outline:none;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+        <button onclick="binderSaveRename('${b.id}')" style="padding:3px 10px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-size:10px;cursor:pointer;">保存</button>
+        <button onclick="binderCancelRename('${b.id}')" style="padding:3px 8px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-size:10px;color:var(--text2);cursor:pointer;">キャンセル</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function binderStartRename(id){
+  document.getElementById('binderEdit_'+id).style.display='flex';
+  document.getElementById('binderRenameInput_'+id).focus();
+}
+function binderCancelRename(id){
+  document.getElementById('binderEdit_'+id).style.display='none';
+}
+function binderSaveRename(id){
+  const input=document.getElementById('binderRenameInput_'+id);
+  const name=input?.value.trim();if(!name)return;
+  const b=binders.find(x=>x.id===id);if(!b)return;
+  b.name=name;b.updatedAt=Date.now();
+  bindersSave();renderBinderTab();
+}
+function deleteBinder(id){
+  if(!confirm('この束を削除しますか？'))return;
+  binders=binders.filter(x=>x.id!==id);
+  bindersSave();renderBinderTab();
+}
+
+function openSavedBinder(binderId){
+  const b=binders.find(x=>x.id===binderId);if(!b)return;
+  _binderCardIds=[...b.cardIds];
+  const cards=_binderCardIds.map(id=>outlines.find(x=>x.id===id)).filter(Boolean);
+  document.getElementById('binderLabel').textContent=esc(b.name)+' · '+cards.length+'件';
+  document.getElementById('binderNameInput').value=b.name;
+  renderBinderThumbList(cards);
+  if(cards[0])showBinderCard(cards[0].id);
+  document.getElementById('binderOverlay').style.display='flex';
+}
+
+function switchToBinderTab(){
+  document.querySelectorAll('.phase-screen').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.phase-step').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('phase5b');
+  if(el){el.style.display='flex';el.classList.add('active');}
+  document.getElementById('ps-5b')?.classList.add('active');
+  bindersLoad();renderBinderTab();
+}
+
 function renderCardGrid(){
+  unifyMediaScrapCards();
   const q=(document.getElementById('cardGridSearch')?.value||'').trim().toLowerCase();
   let pool=[...outlines].sort((a,b)=>b.updatedAt-a.updatedAt)
     .filter(ol=>!ol.isSource&&!ol.isScrap)
@@ -3441,19 +3724,9 @@ function cdOnBlur(div){
   const idx=parseInt(div.dataset.idx);
   const text=div.textContent;
   div.dataset.text=text;
-  const m=cardItemMeta(text);
-  // HR行: テキストを隠して線を戻す
-  if(m.type==='hr'){
-    div.textContent='---';
-    div.style.cssText='width:0;height:0;overflow:hidden;outline:none;';
-    const line=div.parentElement?.querySelector('div[style*="border-top"]');
-    if(line)line.style.display='';
-  } else {
-    div.innerHTML=linkifyCard(m.display||text);
-    if(m.textStyle)div.style.cssText='outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;'+m.textStyle;
-  }
+  div.innerHTML=linkifyCard(text);
   const ol=outlines.find(x=>x.id===olId);
-  if(ol&&ol.items[idx]){ol.items[idx].text=text;ol.updatedAt=Date.now();save();}
+  if(ol&&ol.items[idx]){ol.items[idx].text=text;if(text.trim())ol.items[idx].blank=false;ol.updatedAt=Date.now();save();}
 }
 function cdToggleLevel(olId,idx){
   const ol=outlines.find(x=>x.id===olId);if(!ol)return;
@@ -3493,16 +3766,13 @@ function cdRenderItems(ol){
   container.innerHTML=ol.items.map((it,i)=>{
     const lvl=it.level||0;
     const text=it.text||'';
-    const m=cardItemMeta(text);
-    if(m.type==='hr')
-      return '<div class="cd-item" data-idx="'+i+'" style="display:flex;align-items:center;padding:'+(lvl*22)+'px 0 0;">'+'<div style="flex:1;border-top:2px solid var(--border2);margin:6px 0;"></div>'+'<div class="card-detail-text" contenteditable="true" spellcheck="false" data-ol="'+ol.id+'" data-idx="'+i+'" data-text="---"'+' style="width:0;height:0;overflow:hidden;outline:none;"'+' onfocus="cdOnFocus(this)" onblur="cdOnBlur(this)" onkeydown="onCardDetailItemKey(event,this,\''+ol.id+'\','+i+')">---</div>'+'</div>';
-    const bVis=(!text||m.hideBullet)?'hidden':'visible';
-    const displayHTML=linkifyCard(m.display||text);
-    return '<div class="cd-item" data-idx="'+i+'" style="display:flex;align-items:baseline;gap:6px;padding:2px 0;padding-left:'+(lvl*22)+'px;'+m.wrapStyle+'">'
+    const bVis=((!text)&&it.blank)?'hidden':'visible';
+    const displayHTML=linkifyCard(text);
+    return '<div class="cd-item" data-idx="'+i+'" style="display:flex;align-items:baseline;gap:6px;padding:2px 0;padding-left:'+(lvl*22)+'px;">'
       +'<span class="card-detail-bullet" style="cursor:pointer;user-select:none;flex-shrink:0;visibility:'+bVis+'" onclick="cdToggleLevel(\''+ol.id+'\','+i+')">•</span>'
       +'<div class="card-detail-text" contenteditable="true" spellcheck="false"'
       +' data-ol="'+ol.id+'" data-idx="'+i+'" data-text="'+esc(text)+'"'
-      +' style="outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;'+m.textStyle+'"'
+      +' style="outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;"'
       +' onfocus="cdOnFocus(this)" onblur="cdOnBlur(this)"'
       +' onkeydown="onCardDetailItemKey(event,this,\''+ol.id+'\','+i+')"'
       +' oninput="cdOnInput(this)"'
@@ -3516,7 +3786,10 @@ function cdRenderItems(ol){
 function cdSaveAllTexts(ol){
   document.querySelectorAll('#cdItems .card-detail-text').forEach(el=>{
     const i=parseInt(el.dataset.idx);
-    if(!isNaN(i)&&ol.items[i])ol.items[i].text=el.textContent.trim()||el.dataset.text||'';
+    if(!isNaN(i)&&ol.items[i]){
+      ol.items[i].text=el.textContent.trim()||el.dataset.text||'';
+      if(ol.items[i].text)ol.items[i].blank=false;
+    }
   });
 }
 
@@ -3529,6 +3802,22 @@ function onCardDetailItemKey(e,div,olId,idx){
     cdSaveAllTexts(ol);
     const text=ol.items[idx].text||'';
     const curLevel=ol.items[idx].level||0;
+    // 空行でのEnter: 1回目はバレットを消してスペーサー化（その場に留まる）、
+    // すでにスペーサーなら下に新しい通常行を追加
+    if(!text.trim()){
+      if(!ol.items[idx].blank){
+        ol.items[idx].blank=true;
+        ol.updatedAt=Date.now();save();
+        cdRenderItems(ol);
+        cdFocus(idx,false);
+      } else {
+        ol.items.splice(idx+1,0,{id:uid(),text:'',level:curLevel});
+        ol.updatedAt=Date.now();save();
+        cdRenderItems(ol);
+        cdFocus(idx+1,true);
+      }
+      return;
+    }
     let pos=text.length;
     const sel=window.getSelection();
     if(sel&&sel.rangeCount>0){
@@ -3612,7 +3901,7 @@ function onCardDetailItemKey(e,div,olId,idx){
     if(divs[idx-1]){e.preventDefault();divs[idx-1].focus();}
   } else if(e.key==='ArrowDown'&&!e.shiftKey){
     const divs=document.querySelectorAll('#cdItems .card-detail-text');
-    if(divs[idx+1]){e.preventDefault();divs[idx+1].focus();}
+    if(divs[idx+1]){e.preventDefault();cdFocus(idx+1,true);}
   }
 }
 
@@ -3685,19 +3974,7 @@ function clearCardSourceRef(){
 
 // ── カード間リンク [[カード名]] ─────────────────────────────
 // カード行のマークダウン解析（見出しなし）
-function cardItemMeta(text){
-  const t=text||'';
-  if(t==='---'||t==='***')
-    return{type:'hr',display:'',hideBullet:true,
-      wrapStyle:'border-top:2px solid var(--border2);margin:6px 0;padding:0;',textStyle:''};
-  if(t.startsWith('> '))
-    return{type:'quote',display:t.slice(2),hideBullet:true,
-      wrapStyle:'border-left:3px solid var(--border2);padding-left:8px;margin:1px 0;',
-      textStyle:'color:var(--text2);font-style:italic;'};
-  return{type:'text',display:t,hideBullet:false,wrapStyle:'',textStyle:''};
-}
-
-// インラインマークダウン＋カードリンク＋URL描画
+// カードリンク（[[リンク]]）＋URLハイパーリンク描画
 function linkifyCard(text){
   if(!text)return'';
   const t=text;
@@ -3709,9 +3986,7 @@ function linkifyCard(text){
       return`<span class="card-link" data-card-id="${target.id}" onmousedown="event.preventDefault();openCardDetail('${target.id}')" title="${esc(raw)}">${esc(raw)}</span>`;
     return`<span class="card-link new" data-card-title="${esc(raw)}" onmousedown="event.preventDefault();createCardFromLink('${esc(raw)}')" title="新規カードを作成: ${esc(raw)}">${esc(raw)}</span>`;
   });
-  // **bold**
-  html=html.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-  // URL → 短縮リンク
+  // URL → 短縮ハイパーリンク
   html=html.replace(/(https?:\/\/[^\s<"]+)/g,url=>{
     try{
       const u=new URL(url);
@@ -3763,6 +4038,7 @@ function renderBacklinksSection(outlineId){
 }
 
 function openCardDetail(outlineId){
+  unifyMediaScrapCards();
   currentCardOutlineId=outlineId;
   const ol=outlines.find(x=>x.id===outlineId);if(!ol)return;
   const detail=document.getElementById('cardDetail');
@@ -3817,20 +4093,18 @@ function openCardDetail(outlineId){
       if(p?.images?.length)postImgsHtml=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${p.images.map(src=>`<img src="${src}" onclick="openLightbox('${src}')" class="card-detail-card-image" loading="lazy">`).join('')}</div>`;
     }
     // フォーカス時はテキスト編集、それ以外はリンクレンダリング
-    const m=cardItemMeta(text);
-    if(m.type==='hr') return`<div class="cd-item" data-idx="${i}" style="display:flex;align-items:center;padding-left:${lvl*22}px;"><div style="flex:1;border-top:2px solid var(--border2);margin:6px 0;"></div><div class="card-detail-text" contenteditable="true" spellcheck="false" data-ol="${ol.id}" data-idx="${i}" data-text="---" style="width:0;height:0;overflow:hidden;outline:none;" onfocus="cdOnFocus(this)" onblur="cdOnBlur(this)" onkeydown="onCardDetailItemKey(event,this,'${ol.id}',${i})">---</div></div>`;
-    const bVis=(!text||m.hideBullet)?'hidden':'visible';
-    return`<div class="cd-item" data-idx="${i}" style="display:flex;align-items:baseline;gap:6px;padding:2px 0;padding-left:${lvl*22}px;${m.wrapStyle}">
+    const bVis=((!text)&&it.blank)?'hidden':'visible';
+    return`<div class="cd-item" data-idx="${i}" style="display:flex;align-items:baseline;gap:6px;padding:2px 0;padding-left:${lvl*22}px;">
       <span class="card-detail-bullet" style="cursor:pointer;user-select:none;flex-shrink:0;visibility:${bVis};" onclick="cdToggleLevel('${ol.id}',${i})">•</span>
       <div style="flex:1;">
         <div class="card-detail-text" contenteditable="true" spellcheck="false"
           data-ol="${ol.id}" data-idx="${i}" data-text="${esc(text)}"
-          style="outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;${m.textStyle}"
+          style="outline:none;cursor:text;min-width:20px;white-space:pre-wrap;word-break:break-word;"
           onfocus="cdOnFocus(this)"
           onblur="cdOnBlur(this)"
           onkeydown="onCardDetailItemKey(event,this,'${ol.id}',${i})"
           oninput="cdOnInput(this)"
-        >${linkifyCard(m.display||text)}</div>
+        >${linkifyCard(text)}</div>
         ${postImgsHtml}
       </div>
     </div>`;
@@ -3855,7 +4129,7 @@ function openCardDetail(outlineId){
           onchange="saveCardType(this.value)"
           onblur="saveCardType(this.value)">
         <datalist id="cardTypeList">
-          <option value="キーワード"><option value="テーゼ"><option value="記録"><option value="アイデア"><option value="思考"><option value="メモ"><option value="疑問"><option value="引用"><option value="構造"><option value="反論">
+          <option value="メディア"><option value="スクラップ"><option value="問い"><option value="キーワード"><option value="テーゼ"><option value="記録"><option value="アイデア"><option value="思考"><option value="メモ"><option value="疑問"><option value="引用"><option value="構造"><option value="反論">
         </datalist>
       </div>
     </div>`;
@@ -3936,7 +4210,8 @@ function openCardDetail(outlineId){
   <div style="max-width:720px;margin:.5rem auto 0;display:flex;gap:5px;flex-wrap:wrap;align-items:center;padding:4px 0;">
     <input class="card-label-in" id="cardLabelIn" placeholder="ラベルを追加…" style="flex:1;min-width:80px;max-width:160px;" onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();addCardLabel();}">
     <button class="card-img-upload-btn" onclick="addCardLabel()" style="font-size:11px;">＋</button>
-    ${!ol.isScrap?`<button class="card-img-upload-btn" onclick="document.getElementById('cardImgInput').click()" style="font-size:11px;">🖼️</button><input type="file" id="cardImgInput" accept="image/*" multiple style="display:none" onchange="onCardImageSelected(event)"><button class="card-img-upload-btn" onclick="openImgLibrary('card')" style="font-size:11px;">📂</button><button class="card-img-upload-btn" onclick="toggleCardSourceRefPanel()" style="font-size:11px;" title="メディアに紐付ける">📎</button>`:''}\
+    ${(!ol.isSource&&!ol.isScrap)?`<button class="card-img-upload-btn" onclick="openCardPostPicker()" style="font-size:11px;" title="タイムラインのつぶやきから追加">💬</button>`:''}
+    ${!ol.isScrap?`<button class="card-img-upload-btn" onclick="document.getElementById('cardImgInput').click()" style="font-size:11px;">🖼️</button><input type="file" id="cardImgInput" accept="image/*" multiple style="display:none" onchange="onCardImageSelected(event)"><button class="card-img-upload-btn" onclick="openImgLibrary('card')" style="font-size:11px;">📂</button>`:''}\
     ${`<button onclick="${ol.isSource?'deleteSourceCardConfirm':ol.isScrap?'deleteScrapCard':'deleteNormalCard'}()" style="margin-left:auto;padding:4px 12px;background:none;color:var(--red);border:0.5px solid var(--red);border-radius:20px;font-size:11px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;cursor:pointer;">🗑</button>`}\
   </div>
   <div id="cardLinkedPostsSection" style="max-width:720px;margin:.5rem auto 0;"></div>
@@ -4056,7 +4331,9 @@ function closeCardDetail(){
   else if(currentPhase===11)renderScrapGrid11();
   else if(currentPhase===9)renderScrapGrid();
   else if(currentPhase===10)renderObjectGrid();
-  else if(currentPhase===5)renderCardGrid();
+  else if(currentPhase===5){renderCardGrid();renderCardFilterPanelContent();}
+  // 旧アウトライン一覧(phase3)は廃止 → カード一覧へ戻す
+  else if(currentPhase===3)switchPhase(5);
 }
 
 function outlineToCosensetText(ol){
@@ -4160,6 +4437,8 @@ function exportCardText(fmt='txt'){
 
 // ─── BOOK VIEW ────────────────────────────────────────────
 let books=[];
+let binders=[];
+const KBIND='tn_binders_v20';
 let currentBookId=null;
 let currentBookNoteId=null;
 let bookSidebarOpen=true;
@@ -4167,6 +4446,8 @@ const KB='tn_books_v20';
 
 function booksLoad(){books=JSON.parse(localStorage.getItem(KB)||'[]');}
 function booksSave(){localStorage.setItem(KB,JSON.stringify(books));}
+function bindersLoad(){binders=JSON.parse(localStorage.getItem(KBIND)||'[]');}
+function bindersSave(){localStorage.setItem(KBIND,JSON.stringify(binders));}
 
 function renderBookView(){booksLoad();renderBookSidebar();}
 
@@ -4301,8 +4582,11 @@ function renderObjectRelated(ol){
     ? outlines.filter(x=>x.id===ol.cardSourceRef.outlineId)
     : [];
 
-  const hasContent=linkedCards.length||backlinks.length||sameLabel.length||refMedia.length;
-  console.log('renderObjectRelated:', ol.title, {linkedCards:linkedCards.length, backlinks:backlinks.length, sameLabel:sameLabel.length, refMedia:refMedia.length, hasContent});
+  // 5. 言及つぶやき（このカードを sourceRef で参照している投稿）
+  const mentions=posts.filter(p=>p.sourceRef&&p.sourceRef.outlineId===ol.id)
+    .sort((a,b)=>b.createdAt-a.createdAt);
+
+  const hasContent=linkedCards.length||backlinks.length||sameLabel.length||refMedia.length||mentions.length;
   if(!hasContent){related.style.display='none';return;}
   related.style.display='flex';
 
@@ -4341,6 +4625,19 @@ function renderObjectRelated(ol){
         <div style="${tts}color:var(--source);">📎 ${esc(m.title||'無題')}</div>
         ${sub}
         <div style="${ms}">${esc(domain)}</div>
+      </div>`;
+    }).join('');
+  }
+  // 5. 言及つぶやき（カード枠外・関連の下にぶら下げる）
+  if(mentions.length){
+    html+=hd(`💬 言及つぶやき（${mentions.length}）`);
+    html+=mentions.map(p=>{
+      const txt=esc(cleanText(p.content).slice(0,120));
+      const rep=(p.replies||[]).length;
+      const jump=`switchPhase(1);closeCardDetail();setTimeout(()=>{const el=document.getElementById('post-'+'${p.id}');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},120);`;
+      return`<div onclick="${jump}" style="padding:3px 4px;cursor:pointer;flex-shrink:0;color:var(--text);" onmouseover="this.style.color='var(--accent-d)'" onmouseout="this.style.color='var(--text)'">
+        <div style="font-size:11px;color:inherit;line-height:1.5;white-space:pre-wrap;word-break:break-word;">${txt}</div>
+        <div style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:9px;color:var(--text3);margin-top:2px;">${fmtDt(p.createdAt)}${rep?` · ↩ ${rep}件`:''}</div>
       </div>`;
     }).join('');
   }
@@ -5105,8 +5402,13 @@ function importBackup(){
       localStorage.setItem(KN,JSON.stringify(notes));
       localStorage.setItem(KO,JSON.stringify(outlines));
 
-      // 2. 画面を更新
+      // 2. 画面を更新（カードも含む）
       renderSidebar();renderFeed();
+      if(typeof renderCardGrid==='function')renderCardGrid();
+
+      // 次のSupabase自動同期でデータが上書きされないようフラグを立てる
+      _skipNextSync=true;
+      setTimeout(()=>{_skipNextSync=false;},30000);
 
       // 3. Supabaseに書く（直接upsert、saveTimerなし）
       if(currentUser){
@@ -5142,6 +5444,60 @@ function loadLocal(){
   if(!posts.length)posts=DEMO_POSTS;
   if(!notes.length)notes=DEMO_NOTES;
   if(!outlines.length)outlines=DEMO_OUTLINES;
+  unifyMediaScrapCards();
+}
+
+// ─── メディア・スクラップを通常カードに統合（廃止に伴う移行・冪等）───
+// 固有データ（URL/メモ/エピソード/ハイライト等）を本文項目に流し込み、
+// サムネ画像はカード画像へ。元フィールドは内部保持で消失なし。
+// ⚠️ 重要: この関数は updatedAt を変更せず save() も呼ばない（メモリ上の表示変換のみ）。
+// 以前は updatedAt を「今」に更新して自動アップロードしていたため、古い端末が
+// 「自分が最新」と誤認してクラウドを上書きし、データを失う事故が起きた。
+// 永続化はユーザーがカードを実際に編集した時の save() に委ねる。
+function unifyMediaScrapCards(){
+  (outlines||[]).forEach(ol=>{
+    // 旧メディア/スクラップ判定（統合後も残存フィールドで識別できる）
+    const wasMedia=ol.isSource||ol.sourceUrl!==undefined||ol.sourceSubItems!==undefined||ol.sourceImage!==undefined||ol.sourceMemo!==undefined||ol.sourcePdfUrl!==undefined;
+    const wasScrap=ol.isScrap||ol.scrapUrl!==undefined||ol.scrapHighlights!==undefined||ol.scrapSnippet!==undefined||ol.scrapImages!==undefined;
+    // タイプ色を付与（未設定時のみ・既統合カードにも反映）※updatedAtは変更しない
+    if(!ol.cardType&&(wasMedia||wasScrap)){
+      ol.cardType=wasScrap?'スクラップ':'メディア';
+    }
+    if(!ol.isSource&&!ol.isScrap)return;
+    if(!ol.items)ol.items=[];
+    if(!ol.images)ol.images=[];
+    const extra=[];
+    if(ol.isSource){
+      if(ol.sourceUrl)extra.push('🔗 '+ol.sourceUrl);
+      if(ol.sourcePdfUrl)extra.push('📄 '+ol.sourcePdfUrl);
+      if(ol.sourceMemo)extra.push(ol.sourceMemo);
+      (ol.sourceSubItems||[]).forEach(si=>{
+        const t=(si.label||'')+(si.url?(' '+si.url):'');
+        if(t.trim())extra.push('• '+t);
+      });
+      if(ol.sourceImage&&!ol.images.includes(ol.sourceImage))ol.images.push(ol.sourceImage);
+    }
+    if(ol.isScrap){
+      if(ol.scrapUrl)extra.push('🔗 '+ol.scrapUrl);
+      if(ol.scrapDescription)extra.push(ol.scrapDescription);
+      if(ol.scrapSnippet)extra.push(ol.scrapSnippet);
+      (ol.scrapHighlights||[]).forEach(h=>{
+        const t=(h.text||'')+(h.comment?(' — '+h.comment):'');
+        if(t.trim())extra.push('“'+t+'”');
+      });
+      [ol.scrapImage,...(ol.scrapImages||[])].filter(Boolean).forEach(src=>{
+        if(!ol.images.includes(src))ol.images.push(src);
+      });
+    }
+    const existing=new Set(ol.items.map(it=>(it.text||'').trim()));
+    extra.forEach(t=>{
+      const tt=(t||'').trim();
+      if(tt&&!existing.has(tt)){ol.items.push({id:uid(),text:tt,level:0});existing.add(tt);}
+    });
+    // フラグはメモリ上で解除（永続化しない＝同期事故を避ける）
+    delete ol.isSource;
+    delete ol.isScrap;
+  });
 }
 // ─── State ────────────────────────────────────────────────
 const KP='tn_posts_v20', KN='tn_notes_v20', KO='tn_outlines_v20';
@@ -5211,6 +5567,7 @@ function mergeImages(postsArr){
   }));
 }
 
+let _skipNextSync=false;
 function save(){
   // localStorageにはdata:URLも含めて全部保存（表示に必要）
   try{localStorage.setItem(KP,JSON.stringify(posts));}catch(e){
@@ -5268,6 +5625,11 @@ function switchPhase(n){
     closeCardDetail();
     if(n===currentPhase)return;
   }
+  // バインダータブを閉じる＋全phaseのインラインstyleをリセット
+  const p5b=document.getElementById('phase5b');
+  if(p5b){p5b.style.display='none';p5b.classList.remove('active');}
+  document.getElementById('ps-5b')?.classList.remove('active');
+  document.querySelectorAll('.phase-screen').forEach(el=>el.style.display='');
   if(window.innerWidth<=640) n=1;
   currentPhase=n;
   [1,2,3,4,5,6,7,8,9,10,11].forEach(i=>{
@@ -5472,40 +5834,18 @@ function renderSourcePickerList(){
   const q=(document.getElementById('sourcePickerSearch')?.value||'').toLowerCase();
   const list=document.getElementById('sourcePickerList');
   if(!list)return;
-  const objects=[...outlines.filter(ol=>ol.isSource||ol.isScrap)]
-    .filter(ol=>!q||(ol.title||'').toLowerCase().includes(q)||(ol.scrapSiteName||'').toLowerCase().includes(q))
-    .sort((a,b)=>(a.title||'').localeCompare(b.title||'','ja'));
+  const objects=[...outlines]
+    .filter(ol=>!q||(ol.title||'').toLowerCase().includes(q))
+    .sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
   if(!objects.length){
-    list.innerHTML=`<div class="source-picker-none">メディア・スクラップがありません<br><span style="font-size:11px;color:var(--text3);">「オブジェクト」タブから作成できます</span></div>`;
+    list.innerHTML=`<div class="source-picker-none">カードがありません<br><span style="font-size:11px;color:var(--text3);">「カード」タブから作成できます</span></div>`;
     return;
   }
   list.innerHTML=objects.map(ol=>{
-    if(ol.isScrap){
-      const site=ol.scrapSiteName||'';
-      return`<div class="source-picker-item" style="border-left:2px solid #3d6b45;">
-        <div class="source-picker-item-title" style="color:#3d6b45;" onclick="event.stopPropagation();selectSourceRef('${ol.id}',null)">✂️ ${esc(ol.title||'無題')}</div>
-        <div class="source-picker-item-meta">${esc(site)}${ol.scrapHighlights?.length?` · ${ol.scrapHighlights.length}件のメモ`:''}</div>
-        <div style="padding:4px 8px 6px;">
-          <div class="source-picker-sub-item" onclick="event.stopPropagation();selectSourceRef('${ol.id}',null)" style="color:#3d6b45;background:#f0f5f0;">引用する</div>
-        </div>
-      </div>`;
-    }
-    const subs=ol.sourceSubItems||[];
-    const subsHtml=subs.length?`
-      <div class="source-picker-sub-list">
-        <div style="font-size:10px;color:var(--text3);font-family:'Hiragino Kaku Gothic ProN',sans-serif;margin-bottom:2px;">エピソード・サブアイテムを選択：</div>
-        ${subs.map(si=>`
-          <div class="source-picker-sub-item" onclick="event.stopPropagation();selectSourceRef('${ol.id}','${si.id}')">
-            ${esc(si.label)}${si.url?`<span style="font-size:9px;color:var(--source);margin-left:6px;">🔗</span>`:''}
-          </div>`).join('')}
-        <div class="source-picker-sub-item" style="color:var(--text3);font-style:italic;" onclick="event.stopPropagation();selectSourceRef('${ol.id}',null)">この媒体全体として引用</div>
-      </div>`:
-      `<div style="padding:4px 8px 6px;"><div class="source-picker-sub-item" onclick="event.stopPropagation();selectSourceRef('${ol.id}',null)" style="color:var(--source);">引用する</div></div>`;
-    const domain=ol.sourceUrl?(()=>{try{return new URL(ol.sourceUrl).hostname;}catch{return ol.sourceUrl.slice(0,30);}})():'';
+    const cnt=(ol.items||[]).length;
     return`<div class="source-picker-item">
-      <div class="source-picker-item-title" onclick="toggleSourcePickerItem(this)">📎 ${esc(ol.title||'無題')}</div>
-      <div class="source-picker-item-meta">${[domain,subs.length?subs.length+'件のサブアイテム':''].filter(Boolean).join(' · ')}</div>
-      ${subsHtml}
+      <div class="source-picker-item-title" onclick="event.stopPropagation();selectSourceRef('${ol.id}',null)">📎 ${esc(ol.title||'無題')}</div>
+      <div class="source-picker-item-meta">${cnt}項目 · ${fmtDate(ol.updatedAt)}</div>
     </div>`;
   }).join('');
 }
@@ -5554,17 +5894,9 @@ function dismissSourceRef(){
 function renderPostSourceCard(ref){
   if(!ref)return'';
   const ol=outlines.find(x=>x.id===ref.outlineId);
-  const isScrap=ol?.isScrap;
   const url=ref.url||(ol?.scrapUrl)||(ol?.sourceUrl)||'';
   const sub=ref.subLabel?` · ${esc(ref.subLabel)}`:'';
-  if(isScrap){
-    return`<div class="post-scrap-card" onclick="event.stopPropagation();switchPhase(10);setTimeout(()=>{renderMediaGrid();openCardDetail('${ref.outlineId}');},50)">
-      <span style="font-size:10px;flex-shrink:0;">✂️</span>
-      <div class="post-scrap-card-title">${esc(ref.title)}</div>
-      ${url?`<a href="${esc(url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:9px;color:#3d6b45;flex-shrink:0;">↗</a>`:''}
-    </div>`;
-  }
-  return`<div class="post-source-card" onclick="event.stopPropagation();switchPhase(10);setTimeout(()=>{renderMediaGrid();openCardDetail('${ref.outlineId}');},50)">
+  return`<div class="post-source-card" onclick="event.stopPropagation();switchPhase(5);setTimeout(()=>openCardDetail('${ref.outlineId}'),60)">
     <span class="post-source-card-icon">📎</span>
     <div class="post-source-card-body">
       <div class="post-source-card-title">${esc(ref.title)}<span style="font-weight:400;color:var(--text3);">${sub}</span></div>
@@ -6921,29 +7253,15 @@ function renderSourcePickerListForEdit(){
   const q=(document.getElementById('sourcePickerSearch')?.value||'').toLowerCase();
   const list=document.getElementById('sourcePickerList');
   if(!list)return;
-  const objects=outlines.filter(ol=>ol.isSource||ol.isScrap)
-    .filter(ol=>!q||(ol.title||'').toLowerCase().includes(q)||(ol.scrapSiteName||'').toLowerCase().includes(q))
-    .sort((a,b)=>(a.title||'').localeCompare(b.title||'','ja'));
-  if(!objects.length){list.innerHTML=`<div class="source-picker-none">メディア・スクラップがありません</div>`;return;}
+  const objects=[...outlines]
+    .filter(ol=>!q||(ol.title||'').toLowerCase().includes(q))
+    .sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  if(!objects.length){list.innerHTML=`<div class="source-picker-none">カードがありません</div>`;return;}
   list.innerHTML=objects.map(ol=>{
-    if(ol.isScrap){
-      return`<div class="source-picker-item" style="border-left:2px solid #3d6b45;">
-        <div class="source-picker-item-title" style="color:#3d6b45;">✂️ ${esc(ol.title||'無題')}</div>
-        <div class="source-picker-item-meta">${esc(ol.scrapSiteName||'')}${ol.scrapHighlights?.length?` · ${ol.scrapHighlights.length}件のメモ`:''}</div>
-        <div style="padding:4px 8px 6px;"><div class="source-picker-sub-item" onclick="event.stopPropagation();editSourceRef(_editingSourceForPostId,'${ol.id}',null)" style="color:#3d6b45;background:#f0f5f0;">引用する</div></div>
-      </div>`;
-    }
-    const subs=ol.sourceSubItems||[];
-    const subsHtml=subs.length?`
-      <div class="source-picker-sub-list">
-        ${subs.map(si=>`<div class="source-picker-sub-item" onclick="event.stopPropagation();editSourceRef(_editingSourceForPostId,'${ol.id}','${si.id}')">${esc(si.label)}</div>`).join('')}
-        <div class="source-picker-sub-item" style="color:var(--text3);font-style:italic;" onclick="event.stopPropagation();editSourceRef(_editingSourceForPostId,'${ol.id}',null)">この媒体全体として引用</div>
-      </div>`:
-      `<div style="padding:4px 8px 6px;"><div class="source-picker-sub-item" onclick="event.stopPropagation();editSourceRef(_editingSourceForPostId,'${ol.id}',null)" style="color:var(--source);">引用する</div></div>`;
+    const cnt=(ol.items||[]).length;
     return`<div class="source-picker-item">
-      <div class="source-picker-item-title">📎 ${esc(ol.title||'無題')}</div>
-      <div class="source-picker-item-meta">${subs.length?subs.length+'件のサブアイテム':''}</div>
-      ${subsHtml}
+      <div class="source-picker-item-title" onclick="event.stopPropagation();editSourceRef(_editingSourceForPostId,'${ol.id}',null)">📎 ${esc(ol.title||'無題')}</div>
+      <div class="source-picker-item-meta">${cnt}項目 · ${fmtDate(ol.updatedAt)}</div>
     </div>`;
   }).join('');
 }
@@ -7699,7 +8017,7 @@ function rwToggleEditor(){
   }
 }
 
-function openReadWriteMode(){
+function openReadWriteMode(layout){
   if(!selectedCardIds.size)return;
   const cards=[..._cardGridPool].filter(x=>selectedCardIds.has(x.id));
   if(!cards.length)return;
@@ -7717,10 +8035,12 @@ function openReadWriteMode(){
       </div>`;
     }).filter(Boolean).join('');
     const lbHtml=(ol.labels||[]).map(l=>`<span style="font-size:7px;padding:1px 7px;border-radius:20px;background:#2c4a7c;color:#fff;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">${esc(l)}</span>`).join('');
+    const imgHtml=(ol.images||[]).map(src=>`<img src="${esc(src)}" class="card-detail-card-image" style="margin-top:8px;" onclick="openLightbox('${src}')" loading="lazy">`).join('');
     return`<div style="margin-bottom:0.5rem;padding:1rem 1.3rem;background:var(--bg2);border-radius:var(--rsm);border:0.5px solid var(--border);">
       <div style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;" onclick="closeReadWriteMode();openCardDetail('${ol.id}')">${esc(ol.title||'無題')}</div>
       ${lbHtml?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">${lbHtml}</div>`:''}
       ${items||'<div style="color:var(--text3);font-size:12px;">（項目なし）</div>'}
+      ${imgHtml}
     </div>`;
   }).join('');
 
@@ -7730,9 +8050,17 @@ function openReadWriteMode(){
   if(right)right.style.display='none';
   const btn=document.getElementById('rwOpenEditorBtn');
   if(btn)btn.textContent='＋ 新しいカードを作成';btn.style.background='var(--accent)';
-  document.getElementById('rwLeft').style.maxWidth='780px';
+  document.getElementById('rwLeft').style.maxWidth='none';
   rwRenderItems();
   document.getElementById('rwModeLabel').textContent=`${cards.length}件のカードを閲覧中`;
+  // レイアウト適用
+  const lft=document.getElementById('rwLeft');
+  if(layout==='horizontal'){
+    lft.style.display='flex';lft.style.flexDirection='row';lft.style.overflowX='auto';lft.style.overflowY='hidden';lft.style.gap='1rem';lft.style.alignItems='flex-start';
+    lft.querySelectorAll&&setTimeout(()=>lft.querySelectorAll('[style*="background:var(--bg2)"]').forEach(d=>{d.style.minWidth='320px';d.style.maxWidth='320px';d.style.marginBottom='0';}),10);
+  } else {
+    lft.style.display='block';lft.style.flexDirection='';lft.style.overflowX='';lft.style.overflowY='auto';
+  }
   document.getElementById('readWriteOverlay').style.display='flex';
 }
 
@@ -8352,6 +8680,36 @@ if(window.innerWidth<=640){
 </div>
 
 <!-- カードリンクサジェスト -->
+<!-- ── バインダーオーバーレイ ── -->
+<div id="binderOverlay" style="display:none;position:fixed;inset:0;z-index:450;background:var(--bg);flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:10px;padding:8px 16px;border-bottom:0.5px solid var(--border);background:var(--bg3);flex-shrink:0;">
+    <button onclick="closeBinderMode()" style="padding:4px 12px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;">✕ 閉じる</button>
+    <span id="binderLabel" style="font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:12px;color:var(--text2);flex:1;"></span>
+    <button onclick="toggleBinderEditor()" id="binderEditorBtn" style="padding:4px 12px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;">＋ 新しいカードを作成</button>
+    <input id="binderNameInput" placeholder="束の名前…" style="padding:4px 10px;border:0.5px solid var(--border2);border-radius:20px;font-size:11px;outline:none;width:160px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">
+    <button onclick="saveBinder()" style="padding:4px 12px;background:#5a6a8a;color:#fff;border:none;border-radius:20px;font-family:'Hiragino Kaku Gothic ProN',sans-serif;font-size:11px;cursor:pointer;">💾 束として保存</button>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
+    <!-- 左：カードサムネ一覧 -->
+    <div id="binderThumbList" style="width:220px;flex-shrink:0;border-right:0.5px solid var(--border);overflow-y:auto;padding:8px;background:var(--bg3);"></div>
+    <!-- 中央：カード全文 -->
+    <div id="binderCardView" style="flex:1;overflow-y:auto;padding:1.5rem 2rem;"></div>
+    <!-- 右：新規カードエディタ（折りたたみ） -->
+    <div id="binderEditorPane" style="display:none;width:300px;flex-shrink:0;border-left:0.5px solid var(--border);overflow-y:auto;padding:10px 14px;background:var(--bg3);flex-direction:column;gap:8px;">
+      <div class="card-detail-card" style="max-width:none;margin:0;padding:1rem;flex:1;display:flex;flex-direction:column;gap:8px;">
+        <div contenteditable="true" spellcheck="false" id="binderNewTitle"
+          style="font-size:16px;font-weight:700;color:var(--text);outline:none;border-bottom:1.5px dashed var(--border2);padding-bottom:4px;"
+          data-placeholder="カードのタイトル"></div>
+        <div id="binderNewItems" style="flex:1;min-height:80px;"></div>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:flex-end;flex-shrink:0;">
+        <button onclick="toggleBinderEditor()" style="padding:3px 10px;background:none;border:0.5px solid var(--border2);border-radius:20px;font-size:10px;cursor:pointer;font-family:'Hiragino Kaku Gothic ProN',sans-serif;color:var(--text2);">✕ 閉じる</button>
+        <button onclick="saveBinderNewCard()" style="padding:3px 12px;background:var(--accent);color:#fff;border:none;border-radius:20px;font-size:10px;cursor:pointer;font-family:'Hiragino Kaku Gothic ProN',sans-serif;">💾 保存して束に追加</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="cardLinkSuggest" style="display:none;position:fixed;z-index:9000;background:var(--bg);border:0.5px solid var(--border2);border-radius:var(--r);box-shadow:0 4px 16px rgba(0,0,0,.12);max-height:200px;overflow-y:auto;min-width:200px;max-width:320px;"></div>
 </body>
 <div id="readWriteOverlay" style="display:none;position:fixed;inset:0;z-index:400;background:var(--bg);flex-direction:column;">
